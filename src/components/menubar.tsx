@@ -14,7 +14,7 @@ type Props = {
 
 class SideMenu extends Component<Props, State> {
   state = {
-    activeItem: 'dailylisting',
+    activeItem: '',
     dropdownMenuStyle: {
       display: "none"
     }

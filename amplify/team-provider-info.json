@@ -1,0 +1,20 @@
+{
+    "dev": {
+        "awscloudformation": {
+            "AuthRoleName": "amplify-hawkeradmindashboard-dev-10824-authRole",
+            "UnauthRoleArn": "arn:aws:iam::423202023851:role/amplify-hawkeradmindashboard-dev-10824-unauthRole",
+            "AuthRoleArn": "arn:aws:iam::423202023851:role/amplify-hawkeradmindashboard-dev-10824-authRole",
+            "Region": "ap-southeast-1",
+            "DeploymentBucketName": "amplify-hawkeradmindashboard-dev-10824-deployment",
+            "UnauthRoleName": "amplify-hawkeradmindashboard-dev-10824-unauthRole",
+            "StackName": "amplify-hawkeradmindashboard-dev-10824",
+            "StackId": "arn:aws:cloudformation:ap-southeast-1:423202023851:stack/amplify-hawkeradmindashboard-dev-10824/dba1eea0-9797-11ea-942c-02c6c7bea9ac",
+            "AmplifyAppId": "d1lruxcc2twhbr"
+        },
+        "categories": {
+            "auth": {
+                "hawkeradmindashboard00dff85900dff859": {}
+            }
+        }
+    }
+}

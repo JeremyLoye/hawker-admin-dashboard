@@ -1,0 +1,55 @@
+{
+    "AWSTemplateFormatVersion": "2010-09-09",
+    "Parameters": {
+        "authhawkeradmindashboard00dff85900dff859UserPoolId": {
+            "Type": "String",
+            "Default": "authhawkeradmindashboard00dff85900dff859UserPoolId"
+        },
+        
+        "authhawkeradmindashboard00dff85900dff859AppClientID": {
+            "Type": "String",
+            "Default": "authhawkeradmindashboard00dff85900dff859AppClientID"
+        },
+        "authhawkeradmindashboard00dff85900dff859AppClientIDWeb": {
+            "Type": "String",
+            "Default": "authhawkeradmindashboard00dff85900dff859AppClientIDWeb"
+        },
+        "AuthRoleArn": {
+            "Type": "String"
+        },
+        "UnauthRoleArn": {
+            "Type": "String"
+        },
+        "env": {
+            "Type": "String"
+        }
+    },
+    "Conditions": {
+        "ShouldNotCreateEnvResources": {
+            "Fn::Equals": [
+                {
+                    "Ref": "env"
+                },
+                "NONE"
+            ]
+        }
+    },
+    "Resources": {
+    
+        "adminprivilegesGroup": {
+          "Type" : "AWS::Cognito::UserPoolGroup",
+          "Properties" : {
+              "GroupName" : "adminprivileges",
+              "Precedence" : 1,
+              
+              "UserPoolId" : {
+                "Ref": "authhawkeradmindashboard00dff85900dff859UserPoolId"
+              } 
+            }
+        },
+        
+    
+    
+    },
+    
+}

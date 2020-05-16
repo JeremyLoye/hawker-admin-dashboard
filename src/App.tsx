@@ -1,13 +1,20 @@
 import * as React from 'react';
-
+import { withAuthenticator, AmplifySignOut } from '@aws-amplify/ui-react'
+import Amplify, { Auth } from 'aws-amplify';
+import aws_exports from './aws-exports';
 /** Components */
 import AppRouter from './navigation/routes';
 
-/** Ant design stylesheet */
-import 'antd/dist/antd.css';
+import './App.css';
+
+Amplify.configure(aws_exports);
 
 const App: React.FC = () => {
-  return <AppRouter />;
+  return (
+    <div className="App">
+      <AppRouter />
+    </div>
+  );
 };
 
-export default App;
+export default withAuthenticator(App);
