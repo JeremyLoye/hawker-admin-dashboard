@@ -56,10 +56,7 @@ p.lead {
 .DateInput {
   width: 130px;
 }
-
-@media only screen
-and (max-width : 750px){
-  .crossBtn {
-    float: top;
-  }
-}
+/* 
+.ui[class*="two column"].grid>.column:not(.row), .ui[class*="two column"].grid>.row>.column {
+  width: 30%;
+} */

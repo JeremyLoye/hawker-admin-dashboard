@@ -1,6 +1,6 @@
 import 'react-dates/initialize';
 import React from "react";
-import { Card, DropdownProps, Button, Header, Grid, Radio, CheckboxProps } from 'semantic-ui-react'
+import { Card, DropdownProps, Button, Header, Grid, Radio, CheckboxProps, CardProps, Popup } from 'semantic-ui-react'
 import { Dropdown } from "semantic-ui-react";
 import { Link, Route } from 'react-router-dom';
 import moment, { Moment } from 'moment';
@@ -31,53 +31,71 @@ type State = {
   hawkerCodes: HawkerCode[];
   hawker: string;
   meal: string;
+  isAvailable: boolean;
 }
 
 class StoreList extends React.Component<Props, State> {
   state = {
     hawkerCodes: [],
     hawker: '',
-    meal: ''
+    meal: '',
+    isAvailable: true
   }
 
-  setCheck = (isAvailable: boolean) => {
-    console.log(isAvailable)
-    return isAvailable
+  changeChecked = (isAvail: boolean) => {
+    this.forceUpdate();
   }
-
 
   renderCards = (listing: Listing, date: Moment) => {
     return listing.stalls.map((stall: Stall) => (
-      <Card
-        as={Link}
-        to={`${this.props.pathName}/stall/${stall.stallId}`}
-        key={stall.stallId + " " + date.format("DDMMYYYY")}
-        childKey={stall.stallId + " " + date.format("DDMMYYYY")}
-        image={stall.image}
-        header={stall.name}
-        meta={stall.stallId}
-        fluid={true}
-        extra={
-        <Radio
-        key={stall.stallId + " " + date.format("DDMMYYYY")}
-        label="Availability"
-        checked={this.setCheck(stall.available)}
-        toggle
-        floated="right"
-        onChange={
-          async (event: React.FormEvent<HTMLElement>, data: CheckboxProps) => {
-            event.preventDefault();
-            let stallId = stall.stallId;
-            let isAvailable: any = data.checked;
-            let body = {
-              "stallId": stallId,
-              "available": isAvailable
+      <Popup
+      content={"Stall set to not available for this day"}
+      disabled={stall.available}
+      inverted
+      on='click'
+      key={`${stall.stallId}`}
+      trigger = {
+        <Card
+          as={Link}
+          to={`${this.props.pathName}/stall/${stall.stallId}`}
+          key={stall.stallId + " " + date.format("DDMMYYYY")}
+          childKey={stall.stallId + " " + date.format("DDMMYYYY")}
+          image={stall.image}
+          header={stall.name}
+          meta={stall.stallId}
+          fluid={true}
+          onClick={
+            (event: React.MouseEvent<HTMLElement>, data: CardProps) => {
+              if (!stall.available) {
+                event.preventDefault();
+              }
             }
-            console.log(body)
-            await API.post(`/listings/${date.format("DDMMYYYY")}/availability`, body)
           }
-        }
-        />} />
+          extra={
+            <Radio
+              key={stall.stallId + " " + date.format("DDMMYYYY")}
+              label="Availability"
+              checked={stall.available}
+              toggle
+              floated="right"
+              onChange={
+                async (event: React.FormEvent<HTMLElement>, data: CheckboxProps) => {
+                  event.preventDefault();
+                  let stallId = stall.stallId;
+                  let isAvailable: any = data.checked;
+                  stall.available = isAvailable;
+                  this.changeChecked(isAvailable)
+                  let body = {
+                    "stallId": stallId,
+                    "available": isAvailable
+                  }
+                  console.log(body)
+                  await API.post(`/listings/${date.format("DDMMYYYY")}/availability`, body)
+                }
+              }
+            />} />
+          }
+          />
     ))
   }
 
@@ -135,27 +153,27 @@ class StoreList extends React.Component<Props, State> {
       }
     ]
     return (
-      <Grid columns='two' fluid>
-        <Grid.Column>
-        <Dropdown
-          placeholder='Select Hawker Centre'
-          fluid
-          className="huge"
-          selection
-          options={options}
-          onChange={this.onHawkerSelect}
-        />
+      <Grid columns='two' fluid style={{ paddingBottom: '1em' }}>
+        <Grid.Column width={11}>
+          <Dropdown
+            placeholder='Select Hawker Centre'
+            fluid
+            className="huge"
+            selection
+            options={options}
+            onChange={this.onHawkerSelect}
+          />
         </Grid.Column>
-        
-        <Grid.Column>
-        <Dropdown
-          placeholder='Select Meals'
-          fluid
-          className="huge"
-          selection
-          options={mealOptions}
-          onChange={this.onMealSelect}
-        />
+
+        <Grid.Column width={5}>
+          <Dropdown
+            placeholder='Select Meals'
+            fluid
+            className="huge"
+            selection
+            options={mealOptions}
+            onChange={this.onMealSelect}
+          />
         </Grid.Column>
       </Grid>
     )
@@ -181,16 +199,22 @@ class StoreList extends React.Component<Props, State> {
     } else {
       return (
         <React.Fragment>
-          <Header>{listing.name}</Header>
-          <Button
-            className="crossBtn"
-            floated="right"
-            onClick={() => {
-              this.deleteHawkerChoice(date).then(res => update())
-            }}>
-            X
-          </Button>
-          <Card.Group itemsPerRow="2" stackable>
+          <Grid columns='two' fluid>
+            <Grid.Column>
+              <Header floated='left'>{listing.name}</Header>
+
+            </Grid.Column>
+            <Grid.Column>
+              <Button
+                floated="right"
+                onClick={() => {
+                  this.deleteHawkerChoice(date).then(res => update())
+                }}>
+                X
+              </Button>
+            </Grid.Column>
+          </Grid>
+          <Card.Group itemsPerRow="2" stackable style={{ paddingTop: '2em' }}>
             {this.renderCards(listing!, date)}
           </Card.Group>
         </React.Fragment>
@@ -207,7 +231,7 @@ class StoreList extends React.Component<Props, State> {
             <Route exact path={`${this.props.pathName}`}>
               {this.renderListing(listing, date, update)}
             </Route>
-            <Route path={`${this.props.pathName}/stall/:stallId`} render={(props) => <FoodList listing={listing!} {...props} />} />
+            <Route path={`${this.props.pathName}/stall/:stallId`} render={(props) => <FoodList date={date} listing={listing!} {...props} />} />
 
           </React.Fragment>
         )}
