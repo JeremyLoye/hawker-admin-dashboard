@@ -91,7 +91,7 @@ Parameters:
                     
   userPoolGroupList:
     Type: CommaDelimitedList
-                                                
+                                    
   parentStack:
     Type: String
                 
@@ -100,7 +100,7 @@ Parameters:
               
   dependsOn:
     Type: CommaDelimitedList
-    
+                
 Conditions:
   ShouldNotCreateEnvResources: !Equals [ !Ref env, NONE ]
 
@@ -157,6 +157,9 @@ Resources:
       
       AutoVerifiedAttributes: !Ref autoVerifiedAttributes
       
+      
+      EmailVerificationMessage: !Ref emailVerificationMessage
+      EmailVerificationSubject: !Ref emailVerificationSubject
             
       Policies:
         PasswordPolicy:

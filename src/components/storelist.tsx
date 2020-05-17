@@ -47,7 +47,6 @@ class StoreList extends React.Component<Props, State> {
 
 
   renderCards = (listing: Listing, date: Moment) => {
-    console.log(listing)
     return listing.stalls.map((stall: Stall) => (
       <Card
         as={Link}

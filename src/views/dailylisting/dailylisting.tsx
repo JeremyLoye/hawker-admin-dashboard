@@ -89,7 +89,6 @@ class DailyListing extends React.Component<Props, State> {
   render() {
     return (
       <div>
-        <Container text textAlign="center">
           <p className="lead">
             Select Date to edit:
           <SingleDatePicker
@@ -112,7 +111,6 @@ class DailyListing extends React.Component<Props, State> {
           </ListingContext.Provider>
           </div>
           </Transition>
-        </Container>
       </div>
     );
   }

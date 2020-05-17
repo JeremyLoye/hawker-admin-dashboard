@@ -55,10 +55,10 @@ class SideMenu extends Component<Props, State> {
                 </Menu.Item>
               </Link>
 
-              <Link to={`${this.props.pathName}/store`}>
+              <Link to={`${this.props.pathName}/stall`}>
                 <Menu.Item as='a' active={this.state.activeItem === 'store'}
                   onClick={() => this.setState({ activeItem: 'store' })}>
-                  Stores
+                  Stalls
                 </Menu.Item>
               </Link>
             </Container>
@@ -99,7 +99,7 @@ class SideMenu extends Component<Props, State> {
                   Hawkers
               </Menu.Item>
               </Link>
-              <Link to={`${this.props.pathName}/store`}>
+              <Link to={`${this.props.pathName}/stall`}>
                 <Menu.Item as="a">
                   Stores
               </Menu.Item>

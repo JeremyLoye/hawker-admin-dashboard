@@ -33,22 +33,20 @@ class Dashboard extends Component<Props, State> {
   render() {
     return (
       <div className="App">
-          <Menubar pathName={this.props.match.url}></Menubar>
+        <Menubar pathName={this.props.match.url}></Menubar>
+        <Container  text textAlign="center">
           <Route exact path={`${this.props.match.url}`}>
-          
-          <Container  text textAlign="center" style={{paddingTop: '5em'}}>
-          <Header size="huge">Welcome to Admin Dashboard!</Header>
-          <p className="lead">
-            Use the links above to navigate the dashboard
-          </p>
-            </Container>
-            </Route>
-            <Route path={`${this.props.match.url}/dailylisting/:date`} render={(props) => <DailyListing {...props}/>}/>
-          
+            <Header size="huge">Welcome to Admin Dashboard!</Header>
+            <p className="lead">
+              Use the links above to navigate the dashboard
+            </p>
+          </Route>
+          <Route path={`${this.props.match.url}/dailylisting/:date`} render={(props) => <DailyListing {...props}/>}/>
           <Route exact path={`${this.props.match.url}/hawker`}>
             <Hawker/>
-            </Route>
-          <Route path={`${this.props.match.path}/store`} render={(props) => <Store {...props}/>}/>
+          </Route>
+          <Route path={`${this.props.match.path}/stall`} render={(props) => <Store {...props}/>}/>
+        </Container>
       </div>
     );
   }

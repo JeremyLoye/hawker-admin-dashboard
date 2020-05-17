@@ -2,7 +2,7 @@
     "resourceNameTruncated": "hawker00dff859",
     "userPoolName": "hawkeradmindashboard00dff859_userpool_00dff859",
     "autoVerifiedAttributes": [
-        "phone_number"
+        "email"
     ],
     "mfaConfiguration": "OFF",
     "mfaTypes": [
