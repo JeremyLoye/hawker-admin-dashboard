@@ -1,7 +1,6 @@
 import 'react-dates/initialize';
 import React from "react";
-import { Card, List } from 'semantic-ui-react'
-import { Container, Header, Transition } from "semantic-ui-react";
+import { Container, Transition } from "semantic-ui-react";
 import { Link, RouteComponentProps } from 'react-router-dom';
 import moment, { Moment } from 'moment';
 import { SingleDatePicker } from 'react-dates';
