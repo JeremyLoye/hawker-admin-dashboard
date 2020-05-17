@@ -380,13 +380,13 @@ class UpdateStall extends React.Component<Props> {
                             placeholder="POC"
                             onChange={this.handleContactPocChange}/>
                         <Form.Field
-                            value={this.state.about.openingHours}
+                            value={this.state.contact.openingHours}
                             control={Input}
                             label="Opening Hours"
                             placeholder="e.g. 0900-2000"
                             onChange={this.handleContactOpeningHoursChange}/>
                         <Form.Field
-                            value={this.state.about.number}
+                            value={this.state.contact.number}
                             control={Input}
                             label="Phone Number"
                             placeholder="Number to contact"
