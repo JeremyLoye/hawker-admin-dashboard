@@ -89,7 +89,7 @@ class SideMenu extends Component<Props, State> {
               vertical
               style={this.state.dropdownMenuStyle}
             >
-              <Link to={`${this.props.pathName}/dailylisting`}>
+              <Link to={`${this.props.pathName}/dailylisting/${this.getCurrentDate()}`}>
                 <Menu.Item as="a">
                   Daily Listing
               </Menu.Item>
