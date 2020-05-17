@@ -63,6 +63,7 @@ class Hawker extends Component<State> {
   render() {
     return (
       <React.Fragment>
+        <h1>Under Construction</h1>
         <Dropdown
           placeholder='Select Hawker Centre'
           fluid
@@ -70,13 +71,16 @@ class Hawker extends Component<State> {
           selection
           options={this.state.hawkerOptions}
           onChange={this.onHawkerSelect}/>
-          <Form.Group>
-            <Form.Field
-              value={this.state.hawker.name}
-              control={Input}
-              label="Hawker Centre Name"
-              onChange={this.handleHawkerNameChange}/>
-          </Form.Group>
+          {this.state.hawker.name !== "" ?
+          <Form>
+            <Form.Group>
+              <Form.Field
+                value={this.state.hawker.name}
+                control={Input}
+                label="Hawker Centre Name"
+                onChange={this.handleHawkerNameChange}/>
+            </Form.Group>
+          </Form>:""}
       </React.Fragment>
       
     );
