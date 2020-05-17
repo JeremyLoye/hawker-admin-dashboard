@@ -1,16 +1,16 @@
 import 'react-dates/initialize';
 import React from "react";
-import { Card, DropdownProps, Button } from 'semantic-ui-react'
+import { Card, DropdownProps, Button, Header, Grid, Radio, CheckboxProps } from 'semantic-ui-react'
 import { Dropdown } from "semantic-ui-react";
-import { Link, RouteComponentProps } from 'react-router-dom';
+import { Link, Route } from 'react-router-dom';
 import moment, { Moment } from 'moment';
-import { SingleDatePicker, isInclusivelyAfterDay } from 'react-dates';
 
 import API from './axiosapi';
 
 import 'react-dates/lib/css/_datepicker.css';
 import { Listing, Stall } from './interfaces';
 import { ListingContext } from './listingcontex';
+import FoodList from './foodlist';
 
 interface HawkerCode {
   code: string;
@@ -30,32 +30,55 @@ type Props = {
 type State = {
   hawkerCodes: HawkerCode[];
   hawker: string;
+  meal: string;
 }
 
 class StoreList extends React.Component<Props, State> {
   state = {
     hawkerCodes: [],
-    hawker: ''
+    hawker: '',
+    meal: ''
   }
 
-  // componentDidMount() {
-  //   this.fetchProducts(this.state.date).then( (res: any) => {
-  //     const products: Product[] = res['data']['products']
-  //     this.setState({ products })
-  //     this.setState({ visible: true})
-  //   })
-  // }
+  setCheck = (isAvailable: boolean) => {
+    console.log(isAvailable)
+    return isAvailable
+  }
 
-  renderCards = (listing: Listing) => {
+
+  renderCards = (listing: Listing, date: Moment) => {
+    console.log(listing)
     return listing.stalls.map((stall: Stall) => (
       <Card
         as={Link}
         to={`${this.props.pathName}/stall/${stall.stallId}`}
-        childKey={stall.stallId}
+        key={stall.stallId + " " + date.format("DDMMYYYY")}
+        childKey={stall.stallId + " " + date.format("DDMMYYYY")}
+        image={stall.image}
         header={stall.name}
         meta={stall.stallId}
         fluid={true}
-        extra={"Availability:" + stall.available} />
+        extra={
+        <Radio
+        key={stall.stallId + " " + date.format("DDMMYYYY")}
+        label="Availability"
+        checked={this.setCheck(stall.available)}
+        toggle
+        floated="right"
+        onChange={
+          async (event: React.FormEvent<HTMLElement>, data: CheckboxProps) => {
+            event.preventDefault();
+            let stallId = stall.stallId;
+            let isAvailable: any = data.checked;
+            let body = {
+              "stallId": stallId,
+              "available": isAvailable
+            }
+            console.log(body)
+            await API.post(`/listings/${date.format("DDMMYYYY")}/availability`, body)
+          }
+        }
+        />} />
     ))
   }
 
@@ -65,9 +88,26 @@ class StoreList extends React.Component<Props, State> {
     return promise;
   }
 
-  onChange = (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps) => {
+  postHawkerChoice = async (date: Moment) => {
+    const body = {
+      "code": this.state.hawker,
+      "meal": this.state.meal
+    }
+    await API.post(`/listings/${date.format("DDMMYYYY")}/add`, body)
+  }
+
+  deleteHawkerChoice = async (date: Moment) => {
+    await API.post(`/listings/${date.format("DDMMYYYY")}/delete`)
+  }
+
+  onHawkerSelect = (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps) => {
     let value: any = data.value;
     this.setState({ hawker: value })
+  }
+
+  onMealSelect = (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps) => {
+    let value: any = data.value;
+    this.setState({ meal: value })
   }
 
   renderDropDownSelection = () => {
@@ -83,24 +123,43 @@ class StoreList extends React.Component<Props, State> {
         value: hawkerCode.code
       })
     });
-    return (<Dropdown
-      placeholder='Select Hawker Centre'
-      fluid
-      className="huge"
-      selection
-      options={options}
-      onChange={this.onChange}
-    />
+    let mealOptions = [
+      {
+        key: 'lunch',
+        text: 'lunch',
+        value: 'lunch'
+      },
+      {
+        key: 'dinner',
+        text: 'dinner',
+        value: 'dinner'
+      }
+    ]
+    return (
+      <Grid columns='two' fluid>
+        <Grid.Column>
+        <Dropdown
+          placeholder='Select Hawker Centre'
+          fluid
+          className="huge"
+          selection
+          options={options}
+          onChange={this.onHawkerSelect}
+        />
+        </Grid.Column>
+        
+        <Grid.Column>
+        <Dropdown
+          placeholder='Select Meals'
+          fluid
+          className="huge"
+          selection
+          options={mealOptions}
+          onChange={this.onMealSelect}
+        />
+        </Grid.Column>
+      </Grid>
     )
-  }
-
-  postHawkerChoice = async (date: Moment) => {
-    console.log(this.state.hawker)
-    const body = {
-      "code": this.state.hawker,
-      "meal": "lunch"
-    }
-    await API.post(`/listings/${date.format("DDMMYYYY")}/add`, body)
   }
 
   renderListing = (listing: Listing | null, date: Moment, update: () => void) => {
@@ -110,6 +169,10 @@ class StoreList extends React.Component<Props, State> {
           {this.renderDropDownSelection()}
           <Button
             size="huge"
+            disabled={
+              this.state.hawker === '' ||
+              this.state.meal === ''
+            }
             onClick={() => {
               this.postHawkerChoice(date).then(res => update())
             }}>
@@ -118,9 +181,20 @@ class StoreList extends React.Component<Props, State> {
         </React.Fragment>)
     } else {
       return (
-      <Card.Group itemsPerRow="2" stackable>
-        {this.renderCards(listing!)}
-      </Card.Group>
+        <React.Fragment>
+          <Header>{listing.name}</Header>
+          <Button
+            className="crossBtn"
+            floated="right"
+            onClick={() => {
+              this.deleteHawkerChoice(date).then(res => update())
+            }}>
+            X
+          </Button>
+          <Card.Group itemsPerRow="2" stackable>
+            {this.renderCards(listing!, date)}
+          </Card.Group>
+        </React.Fragment>
       )
     }
   }
@@ -131,29 +205,16 @@ class StoreList extends React.Component<Props, State> {
       <ListingContext.Consumer>
         {({ focused, date, listing, visible, update }) => (
           <React.Fragment>
-            <p>Here</p>
-            {this.renderListing(listing, date, update)}
+            <Route exact path={`${this.props.pathName}`}>
+              {this.renderListing(listing, date, update)}
+            </Route>
+            <Route path={`${this.props.pathName}/stall/:stallId`} render={(props) => <FoodList listing={listing!} {...props} />} />
+
           </React.Fragment>
         )}
       </ListingContext.Consumer>
     )
   }
-
-  // return (
-  //   <div>
-
-  //       <Transition visible={this.state.visible} animation='scale' duration={500}>
-  //       <div>
-  //       { this.state && this.state.products &&
-  //        <Card.Group itemsPerRow="2" stackable>
-  //        {this.renderCards()}
-  //      </Card.Group>}
-  //       </div>
-  //       </Transition>
-  //     </Container>
-  //   </div>
-  // );
-
 }
 
 StoreList.contextType = ListingContext

@@ -7,11 +7,18 @@ import moment, { Moment } from 'moment';
 import { SingleDatePicker } from 'react-dates';
 
 import API from "../../components/axiosapi";
+
 import { Listing } from "../../components/interfaces";
+
 import { ListingContext } from "../../components/listingcontex";
-import 'react-dates/lib/css/_datepicker.css';
-import "semantic-ui-css/semantic.min.css";
+
 import StoreList from '../../components/storelist';
+
+import 'react-dates/lib/css/_datepicker.css';
+
+import "semantic-ui-css/semantic.min.css";
+
+import './dailylisting.css';
 
 type State = {}
 

@@ -14,11 +14,12 @@ export interface Listing {
 export interface Stall {
   available: boolean;
   food: Food[];
+  image: string;
   name: string;
   stallId: string;
 }
 
-interface Food {
+export interface Food {
   available: boolean;
   description: string;
   id: number;

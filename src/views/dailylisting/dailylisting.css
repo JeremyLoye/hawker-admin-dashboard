@@ -13,6 +13,7 @@ p.lead {
   color: #333333;
   line-height: 1.4;
   font-weight: 300;
+  margin-bottom: 2em;
 }
 
 .ui.huge.header {
@@ -38,4 +39,27 @@ p.lead {
 
 .ui.inverted.menu .active.item {
   background-color: #080808;
+}
+
+.DateInput_input {
+  height: 100%;
+  font-family: Lato,'Helvetica Neue',Arial,Helvetica,sans-serif;
+  font-weight: bold;
+  font-size: 20px;
+  text-align: center;
+}
+
+.SingleDatePicker_picker {
+  z-index: 200;
+}
+
+.DateInput {
+  width: 130px;
+}
+
+@media only screen
+and (max-width : 750px){
+  .crossBtn {
+    float: top;
+  }
 }
