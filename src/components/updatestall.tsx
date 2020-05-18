@@ -1,5 +1,5 @@
 import React from "react";
-import { List, Segment, Grid, Header, Divider, Form, Input, Container, Button, DropdownProps, Dropdown, ButtonProps, TransitionablePortal } from 'semantic-ui-react';
+import { List, Segment, Grid, Header, Divider, Form, Input, Container, Button, InputProps, DropdownProps, Dropdown, ButtonProps, TransitionablePortal } from 'semantic-ui-react';
 import API from './axiosapi';
 import axiosapi from "./axiosapi";
 
@@ -32,10 +32,10 @@ class UpdateStall extends React.Component<Props> {
     componentDidMount() { 
     }
 
-    handleNameChange = (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps) => {
+    handleNameChange = (event: React.SyntheticEvent<HTMLElement>, data: InputProps) => {
         this.setState({name: data.value})
     }
-    handleImageUrlChange = (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps) => {
+    handleImageUrlChange = (event: React.SyntheticEvent<HTMLElement>, data: InputProps) => {
         this.setState({image: data.value})
     }
     handleTypeChange = (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps) => {
@@ -44,7 +44,7 @@ class UpdateStall extends React.Component<Props> {
     handleFoodSelectionChange = (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps) => {
         this.setState({activeFoodItem: data.value})
     }
-    handleFoodNameChange = (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps) => {
+    handleFoodNameChange = (event: React.SyntheticEvent<HTMLElement>, data: InputProps) => {
         const foodList = this.state.food
         this.state.food.forEach((food, index) => {
             if (food.id === this.state.activeFoodItem) {
@@ -53,16 +53,16 @@ class UpdateStall extends React.Component<Props> {
         })
         this.setState({food: foodList})
     }
-    handleFoodPriceChange = (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps) => {
+    handleFoodPriceChange = (event: React.SyntheticEvent<HTMLElement>, data: InputProps) => {
         const foodList = this.state.food
         this.state.food.forEach((food, index) => {
             if (food.id === this.state.activeFoodItem) {
-                foodList[index]['price'] = data.value
+                foodList[index]['price'] = parseFloat(data.value)
             }
         })
         this.setState({food: foodList})
     }
-    handleFoodDescriptionChange = (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps) => {
+    handleFoodDescriptionChange = (event: React.SyntheticEvent<HTMLElement>, data: InputProps) => {
         const foodList = this.state.food
         this.state.food.forEach((food, index) => {
             if (food.id === this.state.activeFoodItem) {
@@ -71,7 +71,7 @@ class UpdateStall extends React.Component<Props> {
         })
         this.setState({food: foodList})
     }
-    handleFoodImageChange = (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps) => {
+    handleFoodImageChange = (event: React.SyntheticEvent<HTMLElement>, data: InputProps) => {
         const foodList = this.state.food
         this.state.food.forEach((food, index) => {
             if (food.id === this.state.activeFoodItem) {
@@ -94,16 +94,16 @@ class UpdateStall extends React.Component<Props> {
             this.setState({food: foodList})
         } 
     }
-    handleNewFoodNameChange = (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps) => {
+    handleNewFoodNameChange = (event: React.SyntheticEvent<HTMLElement>, data: InputProps) => {
         this.setState({newFoodItemName: data.value})
     }
-    handleNewFoodPriceChange = (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps) => {
-        this.setState({newFoodItemPrice: data.value})
+    handleNewFoodPriceChange = (event: React.SyntheticEvent<HTMLElement>, data: InputProps) => {
+        this.setState({newFoodItemPrice: parseFloat(data.value)})
     }
-    handleNewFoodDescriptionChange = (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps) => {
+    handleNewFoodDescriptionChange = (event: React.SyntheticEvent<HTMLElement>, data: InputProps) => {
         this.setState({newFoodItemDescription: data.value})
     }
-    handleNewFoodImageChange = (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps) => {
+    handleNewFoodImageChange = (event: React.SyntheticEvent<HTMLElement>, data: InputProps) => {
         this.setState({newFoodItemImage: data.value})
     }
     addFoodItem = (event: React.SyntheticEvent<HTMLElement>, data: ButtonProps) => {
@@ -131,17 +131,17 @@ class UpdateStall extends React.Component<Props> {
             this.setState({activeFoodItem: 1})
         } 
     }
-    handleAboutDescriptionChange = (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps) => {
+    handleAboutDescriptionChange = (event: React.SyntheticEvent<HTMLElement>, data: InputProps) => {
         let about = this.state.about
         about['description'] = data.value
         this.setState({about: about})
     }
-    handleAboutRecommendedChange = (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps) => {
+    handleAboutRecommendedChange = (event: React.SyntheticEvent<HTMLElement>, data: InputProps) => {
         let about = this.state.about
         about['recommended'] = data.value
         this.setState({about: about})
     }
-    handleAboutImageChange = (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps) => {
+    handleAboutImageChange = (event: React.SyntheticEvent<HTMLElement>, data: InputProps) => {
         this.setState({aboutImage: data.value})
     }
     addAboutImage = (event: React.SyntheticEvent<HTMLElement>, data: ButtonProps) => {
@@ -149,17 +149,17 @@ class UpdateStall extends React.Component<Props> {
         about['images'].push(this.state.aboutImage)
         this.setState({about, aboutImage: ""})
     }
-    handleContactPocChange = (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps) => {
+    handleContactPocChange = (event: React.SyntheticEvent<HTMLElement>, data: InputProps) => {
         let contact = this.state.contact
         contact['poc'] = data.value
         this.setState({contact})
     }
-    handleContactOpeningHoursChange = (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps) => {
+    handleContactOpeningHoursChange = (event: React.SyntheticEvent<HTMLElement>, data: InputProps) => {
         let contact = this.state.contact
         contact['openingHours'] = data.value
         this.setState({contact})
     }
-    handleContactNumberChange = (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps) => {
+    handleContactNumberChange = (event: React.SyntheticEvent<HTMLElement>, data: InputProps) => {
         let contact = this.state.contact
         contact['number'] = data.value
         this.setState({contact})
