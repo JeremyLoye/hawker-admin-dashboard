@@ -1,7 +1,6 @@
 import React from "react";
-import { List, Segment, Grid, Header, Divider, Form, Input, Container, Button, InputProps, DropdownProps, Dropdown, ButtonProps, TransitionablePortal } from 'semantic-ui-react';
+import { Modal, List, Segment, Grid, Header, Divider, Form, Input, Container, Button, InputProps, DropdownProps, Dropdown, ButtonProps, TransitionablePortal } from 'semantic-ui-react';
 import API from './axiosapi';
-import axiosapi from "./axiosapi";
 
 type Props = {
     stall: {
@@ -26,7 +25,8 @@ class UpdateStall extends React.Component<Props> {
         newFoodItemDescription: "",
         newFoodItemImage: "",
         portal: false,
-        aboutImage: ""
+        aboutImage: "",
+        aboutUrl: ""
     }
 
     componentDidMount() { 
@@ -149,6 +149,24 @@ class UpdateStall extends React.Component<Props> {
         about['images'].push(this.state.aboutImage)
         this.setState({about, aboutImage: ""})
     }
+    removeAboutImage = (event: React.SyntheticEvent<HTMLElement>, removeImage: string) => {
+        let about = this.state.about
+        about['images'] = this.state.about.urls.filter((url:string)=>url!==removeImage)
+        this.setState({about})
+    }
+    handleAboutUrlChange = (event: React.SyntheticEvent<HTMLElement>, data: InputProps) => {
+        this.setState({aboutUrl: data.value})
+    }
+    addAboutUrl = (event: React.SyntheticEvent<HTMLElement>, data: ButtonProps) => {
+        const about = this.state.about
+        about['urls'].push(this.state.aboutUrl)
+        this.setState({about, aboutUrl: ""})
+    }
+    removeAboutUrl = (event: React.SyntheticEvent<HTMLElement>, removeUrl: string) => {
+        let about = this.state.about
+        about['urls'] = this.state.about.urls.filter((url:string)=>url!==removeUrl)
+        this.setState({about})
+    }
     handleContactPocChange = (event: React.SyntheticEvent<HTMLElement>, data: InputProps) => {
         let contact = this.state.contact
         contact['poc'] = data.value
@@ -195,7 +213,11 @@ class UpdateStall extends React.Component<Props> {
         return(
             <Container>
                 <h1>Updating {this.state.name}</h1>
-                <Button onClick={this.deleteStall} negative>Delete</Button>
+                <Modal size="tiny" trigger={
+                    <Button negative>Delete</Button>}
+                    header="WARNING"
+                    content={`This action cannot be undone! Are you sure you want to delete #${this.state.stallNo} ${this.state.name}?`}
+                    actions={["Cancel", { key:'delete', content:'Delete', onClick:this.deleteStall, negative: true}]}/>
                 <Divider hidden/>
                 <Divider horizontal>
                     <Header as='h3'>General Information</Header>
@@ -356,16 +378,53 @@ class UpdateStall extends React.Component<Props> {
                                 label="Add images for About page"
                                 placeholder="Image URL"
                                 onChange={this.handleAboutImageChange}/>
-                            <Button onClick={this.addAboutImage} positive>Add Image</Button>
+                            <Button disabled={this.state.aboutImage===""} onClick={this.addAboutImage} positive>Add Image</Button>
                         </Grid.Column>
                         <Grid.Column width={10}>
                             <Header as='h5'>Current Images</Header>
                             {this.state.about.images.length>0?
-                                <List>
+                                <List celled>
                                     {this.state.about.images.map((url:string)=>{
-                                        return(<List.Item key={url}>{url}</List.Item>)
+                                        return(
+                                        <List.Item key={url}>
+                                            <List.Content floated='right' verticalAlign='middle'>
+                                                <Button onClick={(e)=>this.removeAboutImage(e, url)} size='mini' negative>Remove</Button>
+                                            </List.Content>
+                                            <List.Content floated='left' verticalAlign='middle'>
+                                                <a>{url.length>44?url.substring(0,41)+"...":url}</a>
+                                            </List.Content>
+                                        </List.Item>)
                                     })}
                                 </List>:"There are no images currently"}
+                        </Grid.Column>
+                    </Grid>
+                    <Divider hidden/>
+                    <Grid columns={2}>
+                        <Grid.Column width={6}>
+                            <Form.Field
+                                value={this.state.aboutUrl}
+                                control={Input}
+                                label="Add URLs for About page"
+                                placeholder="Reference URL"
+                                onChange={this.handleAboutUrlChange}/>
+                            <Button disabled={this.state.aboutUrl===""} onClick={this.addAboutUrl} positive>Add URL</Button>
+                        </Grid.Column>
+                        <Grid.Column width={10}>
+                            <Header as='h5'>Current URLs</Header>
+                            {this.state.about.urls.length>0?
+                                <List celled>
+                                    {this.state.about.urls.map((url:string)=>{
+                                        return(
+                                            <List.Item key={url}>
+                                            <List.Content floated='right' verticalAlign='middle'>
+                                                <Button onClick={(e)=>this.removeAboutUrl(e, url)} size='mini' negative>Remove</Button>
+                                            </List.Content>
+                                            <List.Content floated='left' verticalAlign='middle'>
+                                                <a>{url.length>44?url.substring(0,41)+"...":url}</a>
+                                            </List.Content>
+                                        </List.Item>)
+                                    })}
+                                </List>:"There are no URLs currently"}
                         </Grid.Column>
                     </Grid>
                     <Divider hidden/>
