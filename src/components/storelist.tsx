@@ -88,9 +88,9 @@ class StoreList extends React.Component<Props, State> {
                     this.changeChecked(isAvailable)
                     let body = {
                       "stallId": stallId,
-                      "available": isAvailable
+                      "available": isAvailable,
+                      "meal": this.state.meal
                     }
-                    console.log(body)
                     await API.post(`/listings/${date.format("DDMMYYYY")}/availability`, body)
                   }
                 }
@@ -200,12 +200,12 @@ class StoreList extends React.Component<Props, State> {
   render() {
     return (
       <ListingContext.Consumer>
-        {({ focused, date, listing, visible, update }) => (
+        {({ date, listing, update }) => (
           <React.Fragment>
             <Route exact path={`${this.props.pathName}`}>
               {this.renderListing(listing, date, update)}
             </Route>
-            <Route path={`${this.props.pathName}/stall/:stallId`} render={(props) => <FoodList date={date} listing={listing!} {...props} />} />
+            <Route path={`${this.props.pathName}/stall/:stallId`} render={(props) => <FoodList meal={this.state.meal} date={date} listing={listing!} {...props} />} />
 
           </React.Fragment>
         )}
