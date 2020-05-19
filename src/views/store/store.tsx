@@ -44,7 +44,8 @@ const emptyStall = {
   about: {
     recommended: "",
     description: "",
-    images: []
+    images: [],
+    urls: []
   },
   contact: {},
   type: []

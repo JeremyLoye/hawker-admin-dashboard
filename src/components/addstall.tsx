@@ -1,5 +1,5 @@
 import React from "react";
-import { List, Segment, Grid, Header, Divider, Form, Input, Container, Button, DropdownProps, Dropdown, ButtonProps, TransitionablePortal } from 'semantic-ui-react';
+import { InputProps, List, Segment, Grid, Header, Divider, Form, Input, Container, Button, DropdownProps, Dropdown, ButtonProps, TransitionablePortal } from 'semantic-ui-react';
 import API from './axiosapi';
 
 type Props = {
@@ -24,16 +24,17 @@ class AddStall extends React.Component<Props> {
         newFoodItemDescription: "",
         newFoodItemImage: "",
         portal: false,
-        aboutImage: ""
+        aboutImage: "",
+        aboutUrl: ""
     }
 
-    handleNameChange = (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps) => {
+    handleNameChange = (event: React.SyntheticEvent<HTMLElement>, data: InputProps) => {
         this.setState({name: data.value})
     }
-    handleImageUrlChange = (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps) => {
+    handleImageUrlChange = (event: React.SyntheticEvent<HTMLElement>, data: InputProps) => {
         this.setState({image: data.value})
     }
-    handleStallNoChange = (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps) => {
+    handleStallNoChange = (event: React.SyntheticEvent<HTMLElement>, data: InputProps) => {
         this.setState({stallNo: data.value})
     }
     handleTypeChange = (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps) => {
@@ -42,7 +43,7 @@ class AddStall extends React.Component<Props> {
     handleFoodSelectionChange = (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps) => {
         this.setState({activeFoodItem: data.value})
     }
-    handleFoodNameChange = (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps) => {
+    handleFoodNameChange = (event: React.SyntheticEvent<HTMLElement>, data: InputProps) => {
         const foodList = this.state.food
         this.state.food.forEach((food, index) => {
             if (food['id'] === this.state.activeFoodItem) {
@@ -51,16 +52,16 @@ class AddStall extends React.Component<Props> {
         })
         this.setState({food: foodList})
     }
-    handleFoodPriceChange = (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps) => {
+    handleFoodPriceChange = (event: React.SyntheticEvent<HTMLElement>, data: InputProps) => {
         const foodList = this.state.food
         this.state.food.forEach((food, index) => {
             if (food.id === this.state.activeFoodItem) {
-                foodList[index]['price'] = data.value
+                foodList[index]['price'] = parseFloat(data.value)
             }
         })
         this.setState({food: foodList})
     }
-    handleFoodDescriptionChange = (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps) => {
+    handleFoodDescriptionChange = (event: React.SyntheticEvent<HTMLElement>, data: InputProps) => {
         const foodList = this.state.food
         this.state.food.forEach((food, index) => {
             if (food.id === this.state.activeFoodItem) {
@@ -69,7 +70,7 @@ class AddStall extends React.Component<Props> {
         })
         this.setState({food: foodList})
     }
-    handleFoodImageChange = (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps) => {
+    handleFoodImageChange = (event: React.SyntheticEvent<HTMLElement>, data: InputProps) => {
         const foodList = this.state.food
         this.state.food.forEach((food, index) => {
             if (food.id === this.state.activeFoodItem) {
@@ -92,13 +93,13 @@ class AddStall extends React.Component<Props> {
             this.setState({food: foodList})
         } 
     }
-    handleNewFoodNameChange = (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps) => {
+    handleNewFoodNameChange = (event: React.SyntheticEvent<HTMLElement>, data: InputProps) => {
         this.setState({newFoodItemName: data.value})
     }
-    handleNewFoodPriceChange = (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps) => {
-        this.setState({newFoodItemPrice: data.value})
+    handleNewFoodPriceChange = (event: React.SyntheticEvent<HTMLElement>, data: InputProps) => {
+        this.setState({newFoodItemPrice: parseFloat(data.value)})
     }
-    handleNewFoodDescriptionChange = (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps) => {
+    handleNewFoodDescriptionChange = (event: React.SyntheticEvent<HTMLElement>, data: InputProps) => {
         this.setState({newFoodItemDescription: data.value})
     }
     handleNewFoodImageChange = (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps) => {
@@ -129,35 +130,53 @@ class AddStall extends React.Component<Props> {
             this.setState({activeFoodItem: 1})
         } 
     }
-    handleAboutDescriptionChange = (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps) => {
+    handleAboutDescriptionChange = (event: React.SyntheticEvent<HTMLElement>, data: InputProps) => {
         let about = this.state.about
         about['description'] = data.value
         this.setState({about: about})
     }
-    handleAboutRecommendedChange = (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps) => {
+    handleAboutRecommendedChange = (event: React.SyntheticEvent<HTMLElement>, data: InputProps) => {
         let about = this.state.about
         about['recommended'] = data.value
         this.setState({about: about})
     }
-    handleAboutImageChange = (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps) => {
+    handleAboutImageChange = (event: React.SyntheticEvent<HTMLElement>, data: InputProps) => {
         this.setState({aboutImage: data.value})
+    }
+    removeAboutImage = (event: React.SyntheticEvent<HTMLElement>, removeImage: string) => {
+        let about = this.state.about
+        about['images'] = this.state.about.urls.filter((url:string)=>url!==removeImage)
+        this.setState({about})
+    }
+    handleAboutUrlChange = (event: React.SyntheticEvent<HTMLElement>, data: InputProps) => {
+        this.setState({aboutUrl: data.value})
+    }
+    addAboutUrl = (event: React.SyntheticEvent<HTMLElement>, data: ButtonProps) => {
+        const about = this.state.about
+        about['urls'].push(this.state.aboutUrl)
+        this.setState({about, aboutUrl: ""})
+    }
+    removeAboutUrl = (event: React.SyntheticEvent<HTMLElement>, removeUrl: string) => {
+        let about = this.state.about
+        about['urls'] = this.state.about.urls.filter((url:string)=>url!==removeUrl)
+        this.setState({about})
     }
     addAboutImage = (event: React.SyntheticEvent<HTMLElement>, data: ButtonProps) => {
         const about = this.state.about
         about['images'].push(this.state.aboutImage)
         this.setState({about, aboutImage: ""})
     }
-    handleContactPocChange = (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps) => {
+    handleContactPocChange = (event: React.SyntheticEvent<HTMLElement>, data: InputProps) => {
         let contact = this.state.contact
         contact['poc'] = data.value
         this.setState({contact})
     }
-    handleContactOpeningHoursChange = (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps) => {
+    handleContactOpeningHoursChange = (event: React.SyntheticEvent<HTMLElement>, data: InputProps) => {
         let contact = this.state.contact
         contact['openingHours'] = data.value
         this.setState({contact})
     }
-    handleContactNumberChange = (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps) => {
+    handleContactNumberChange = (event: React.SyntheticEvent<HTMLElement>, data: InputProps) => {
         let contact = this.state.contact
         contact['number'] = data.value
         this.setState({contact})
@@ -212,6 +231,7 @@ class AddStall extends React.Component<Props> {
                             label='Location Code'
                             placeholder='Location'/>
                         <Form.Field
+                            required
                             value={`${this.state.stallNo}`}
                             control={Input}
                             label='Stall Unit Number'
@@ -346,16 +366,53 @@ class AddStall extends React.Component<Props> {
                                 label="Add images for About page"
                                 placeholder="Image URL"
                                 onChange={this.handleAboutImageChange}/>
-                            <Button onClick={this.addAboutImage} positive>Add Image</Button>
+                            <Button disabled={this.state.aboutImage===""} onClick={this.addAboutImage} positive>Add Image</Button>
                         </Grid.Column>
                         <Grid.Column width={10}>
                             <Header as='h5'>Current Images</Header>
                             {this.state.about.images.length>0?
-                                <List>
+                                <List celled>
                                     {this.state.about.images.map((url:string)=>{
-                                        return(<List.Item key={url}>{url}</List.Item>)
+                                        return(
+                                        <List.Item key={url}>
+                                            <List.Content floated='right' verticalAlign='middle'>
+                                                <Button onClick={(e)=>this.removeAboutImage(e, url)} size='mini' negative>Remove</Button>
+                                            </List.Content>
+                                            <List.Content floated='left' verticalAlign='middle'>
+                                                <a>{url.length>44?url.substring(0,41)+"...":url}</a>
+                                            </List.Content>
+                                        </List.Item>)
                                     })}
                                 </List>:"There are no images currently"}
+                        </Grid.Column>
+                    </Grid>
+                    <Divider hidden/>
+                    <Grid columns={2}>
+                        <Grid.Column width={6}>
+                            <Form.Field
+                                value={this.state.aboutUrl}
+                                control={Input}
+                                label="Add URLs for About page"
+                                placeholder="Reference URL"
+                                onChange={this.handleAboutUrlChange}/>
+                            <Button disabled={this.state.aboutUrl===""} onClick={this.addAboutUrl} positive>Add URL</Button>
+                        </Grid.Column>
+                        <Grid.Column width={10}>
+                            <Header as='h5'>Current URLs</Header>
+                            {this.state.about.urls.length>0?
+                                <List celled>
+                                    {this.state.about.urls.map((url:string)=>{
+                                        return(
+                                            <List.Item key={url}>
+                                            <List.Content floated='right' verticalAlign='middle'>
+                                                <Button onClick={(e)=>this.removeAboutUrl(e, url)} size='mini' negative>Remove</Button>
+                                            </List.Content>
+                                            <List.Content floated='left' verticalAlign='middle'>
+                                                <a>{url.length>44?url.substring(0,41)+"...":url}</a>
+                                            </List.Content>
+                                        </List.Item>)
+                                    })}
+                                </List>:"There are no URLs currently"}
                         </Grid.Column>
                     </Grid>
                     <Divider hidden/>
@@ -389,7 +446,7 @@ class AddStall extends React.Component<Props> {
                         </Segment>
                     </TransitionablePortal>
                     <Button disabled={
-                        this.state.name==="" || this.state.food.length <= 0
+                        this.state.name==="" || this.state.food.length <= 0 || this.state.stallNo===""
                     } onClick={this.addStall} positive>Add</Button>
                     <Divider hidden/>
                 </Form>
