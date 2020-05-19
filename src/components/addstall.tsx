@@ -198,12 +198,16 @@ class AddStall extends React.Component<Props> {
     }
 
     addStall = (event: React.SyntheticEvent<HTMLElement>, data: ButtonProps) => {
+        let stallNo = this.state.stallNo
+        if (stallNo.substring(0,1) === "#") {
+            stallNo = stallNo.substring(1,)
+        }
         const newStall = {
             "name": this.state.name,
             "image": this.state.image,
             "type": this.state.type,
             "location": this.state.location,
-            "stallNo": this.state.stallNo,
+            "stallNo": stallNo,
             "food": this.state.food,
             "about": this.state.about,
             "contact": this.state.contact
@@ -212,6 +216,7 @@ class AddStall extends React.Component<Props> {
         promise.then((res)=>{
             if ("success" in res['data']) {
                 this.setState({portal: true})
+                window.location.reload(false);
             }
         })
     }
@@ -250,7 +255,8 @@ class AddStall extends React.Component<Props> {
                             control={Input}
                             label='Stall Unit Number'
                             placeholder='Stall #'
-                            onChange={this.handleStallNoChange}/>
+                            onChange={this.handleStallNoChange}>
+                            </Form.Field>
                     </Form.Group>
                     <Dropdown
                         placeholder='Stall Type'
@@ -329,7 +335,7 @@ class AddStall extends React.Component<Props> {
                     </Divider>
                     <Grid columns={2}>
                         <Grid.Column width={6} verticalAlign="middle">
-                            <Button onClick={this.addFoodItem} positive>Add</Button>
+                            <Button disabled={this.state.newFoodItemName.length===0} onClick={this.addFoodItem} positive>Add</Button>
                         </Grid.Column>
                         <Grid.Column width={10}>
                             <Form.Group widths='equal'>
