@@ -61,6 +61,12 @@ class SideMenu extends Component<Props, State> {
                   Stalls
                 </Menu.Item>
               </Link>
+              <Link to={`${this.props.pathName}/transactions/${this.getCurrentDate()}`}>
+                <Menu.Item as='a' active={this.state.activeItem === 'transactions'}
+                  onClick={() => this.setState({ activeItem: 'transactions' })}>
+                  Transactions
+                </Menu.Item>
+                </Link>
             </Container>
           </Menu>
         </Grid>

@@ -17,6 +17,7 @@ import DailyListing from "../dailylisting/dailylisting";
 import Hawker from "../hawker/hawker";
 
 import Store from "../store/store";
+import Transactions from "../transactions/transactions";
 
 type State = {};
 
@@ -46,6 +47,7 @@ class Dashboard extends Component<Props, State> {
             <Hawker/>
           </Route>
           <Route path={`${this.props.match.path}/stall`} render={(props) => <Store {...props}/>}/>
+          <Route path={`${this.props.match.url}/transactions/:date`} render={(props) => <Transactions {...props}/>}/>
         </Container>
       </div>
     );

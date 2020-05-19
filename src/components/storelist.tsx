@@ -9,7 +9,7 @@ import API from './axiosapi';
 
 import 'react-dates/lib/css/_datepicker.css';
 import { Listing, Stall } from './interfaces';
-import { ListingContext } from './listingcontex';
+import { ListingContext } from './appcontexts';
 import FoodList from './foodlist';
 
 interface HawkerCode {
@@ -200,11 +200,11 @@ class StoreList extends React.Component<Props, State> {
       return (
         <React.Fragment>
           <Grid columns='two' fluid>
-            <Grid.Column>
+            <Grid.Column width={11}>
               <Header floated='left'>{listing.name}</Header>
 
             </Grid.Column>
-            <Grid.Column>
+            <Grid.Column width={5}>
               <Button
                 floated="right"
                 onClick={() => {

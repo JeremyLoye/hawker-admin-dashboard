@@ -56,3 +56,7 @@ p.lead {
 .DateInput {
   width: 130px;
 }
+
+.active {
+  background: green;
+}

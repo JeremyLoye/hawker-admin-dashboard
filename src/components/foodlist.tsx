@@ -16,7 +16,6 @@ type Props = {
   }
 }
 
-
 class FoodList extends React.Component<Props> {
 
   displayListPosts = () => {

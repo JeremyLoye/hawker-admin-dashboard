@@ -1,4 +1,5 @@
 import React from "react";
+import { Moment } from "moment";
 
 export interface Listing {
   address: string;
@@ -27,4 +28,38 @@ export interface Food {
   name: string;
   price: number;
   quantity: number;
+}
+
+export interface CartItem {
+  stallId: string;
+  name: string;
+  price: number;
+  quantity: number;
+}
+
+export interface Transaction {
+  _id: string;
+  awsId: string;
+  cart: CartItem[];
+  date: string;
+  dateTime: string;
+  meal: string;
+  paid: boolean;
+  paymentMethod: string;
+  paymentUsername: string;
+  totalPrice: number;
+}
+
+interface Payment {
+  method: string;
+  username: string;
+}
+
+export interface User {
+  awsId: string;
+  dateJoined: string;
+  email: string;
+  name: string;
+  phone: string;
+  paymentInfo: Payment[];
 }

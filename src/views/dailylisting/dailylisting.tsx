@@ -9,7 +9,7 @@ import API from "../../components/axiosapi";
 
 import { Listing } from "../../components/interfaces";
 
-import { ListingContext } from "../../components/listingcontex";
+import { ListingContext } from "../../components/appcontexts";
 
 import StoreList from '../../components/storelist';
 
@@ -41,7 +41,6 @@ class DailyListing extends React.Component<Props, State> {
       this.setState({ visible: false })
       this.fetchListing(this.state.date).then((res: any) => {
         if (res['data'] == null) { 
-          console.log("Null set")
           this.setState({ listing: null })
         } else {
           this.setState({ listing: res['data'] })
@@ -71,7 +70,6 @@ class DailyListing extends React.Component<Props, State> {
       this.setState({ visible: false })
       this.fetchListing(date).then((res: any) => {
         if (res['data'] == null) { 
-          console.log("Null set")
           this.setState({ listing: null })
         } else {
           this.setState({ listing: res['data'] })
