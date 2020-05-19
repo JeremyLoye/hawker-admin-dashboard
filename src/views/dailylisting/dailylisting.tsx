@@ -1,6 +1,6 @@
 import 'react-dates/initialize';
 import React from "react";
-import { Container, Transition } from "semantic-ui-react";
+import { Container, Transition, Dropdown, DropdownProps } from "semantic-ui-react";
 import { Link, RouteComponentProps } from 'react-router-dom';
 import moment, { Moment } from 'moment';
 import { SingleDatePicker } from 'react-dates';
@@ -26,6 +26,7 @@ type Props = RouteComponentProps & {
     url: string
     params: {
       date: string
+      meal: string
     }
   }
 }
@@ -34,12 +35,13 @@ class DailyListing extends React.Component<Props, State> {
   state = {
     focused: false,
     date: moment(this.props.match.params.date, "DDMMYYYY"),
+    meal: this.props.match.params.meal,
     listing: null,
     visible: false,
     update: () => {
       this.props.history.push(`/dashboard/dailylisting/${this.state.date.format("DDMMYYYY")}`)
       this.setState({ visible: false })
-      this.fetchListing(this.state.date).then((res: any) => {
+      this.fetchListing(this.state.date, this.state.meal).then((res: any) => {
         if (res['data'] == null) { 
           this.setState({ listing: null })
         } else {
@@ -52,7 +54,7 @@ class DailyListing extends React.Component<Props, State> {
 
   componentDidMount() {
     this.setState({ date: moment(this.props.match.params.date, "DDMMYYYY") })
-    this.fetchListing(this.state.date).then((res: any) => {
+    this.fetchListing(this.state.date, this.state.meal).then((res: any) => {
       if (res['data'] == null) { 
         this.setState({ listing: null })
       } else {
@@ -65,10 +67,10 @@ class DailyListing extends React.Component<Props, State> {
 
   dateChange = (date: Moment) => {
     if (this.state.date.format("DDMMYYYY") !== date.format("DDMMYYYY")) {
-      this.props.history.push(`/dashboard/dailylisting/${date.format("DDMMYYYY")}`)
+      this.props.history.push(`/dashboard/dailylisting/${date.format("DDMMYYYY")}/${this.state.meal}`)
       this.setState({ date })
       this.setState({ visible: false })
-      this.fetchListing(date).then((res: any) => {
+      this.fetchListing(date, this.state.meal).then((res: any) => {
         if (res['data'] == null) { 
           this.setState({ listing: null })
         } else {
@@ -79,12 +81,39 @@ class DailyListing extends React.Component<Props, State> {
     }
   }
 
-  fetchListing = (date: Moment) => {
-    let promise: Promise<Listing> = API.get('/listings/' + date.format("DDMMYYYY"));
+  onMealSelect = (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps) => {
+    let mealString: any = data.value
+    this.props.history.push(`/dashboard/dailylisting/${this.state.date.format("DDMMYYYY")}/${data.value}`)
+    this.setState({ meal: data.value })
+    this.setState({ visible: false })
+    this.fetchListing(this.state.date, mealString).then((res: any) => {
+      if (res['data'] == null) { 
+        this.setState({ listing: null })
+      } else {
+        this.setState({ listing: res['data'] })
+      }
+      this.setState({ visible: true })
+    })
+  }
+
+  fetchListing = (date: Moment, meal: string) => {
+    let promise: Promise<Listing> = API.get('/listings/' + date.format("DDMMYYYY") + "/" + meal);
     return promise;
   }
 
   render() {
+    let mealOptions = [
+      {
+        key: 'lunch',
+        text: 'lunch',
+        value: 'lunch'
+      },
+      {
+        key: 'dinner',
+        text: 'dinner',
+        value: 'dinner'
+      }
+    ]
     return (
       <div>
           <p className="lead">
@@ -101,11 +130,20 @@ class DailyListing extends React.Component<Props, State> {
               displayFormat="DD/MM/YYYY"
               small={true}>
             </SingleDatePicker>
+            and meal:
+            <Dropdown
+            placeholder='Select Meals'
+            compact
+            selection
+            defaultValue={this.state.meal}
+            options={mealOptions}
+            onChange={this.onMealSelect}
+          />
           </p>
           <Transition visible={this.state.visible} animation='scale' duration={500}>
           <div>
           <ListingContext.Provider value={this.state}>
-           <StoreList pathName={this.props.match.url}/>
+           <StoreList pathName={this.props.match.url} meal={this.state.meal}/>
           </ListingContext.Provider>
           </div>
           </Transition>

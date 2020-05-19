@@ -42,7 +42,7 @@ class Dashboard extends Component<Props, State> {
               Use the links above to navigate the dashboard
             </p>
           </Route>
-          <Route path={`${this.props.match.url}/dailylisting/:date`} render={(props) => <DailyListing {...props}/>}/>
+          <Route path={`${this.props.match.url}/dailylisting/:date/:meal`} render={(props) => <DailyListing {...props}/>}/>
           <Route exact path={`${this.props.match.url}/hawker`}>
             <Hawker/>
           </Route>

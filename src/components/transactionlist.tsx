@@ -19,7 +19,7 @@ type Props = {
 
 type State = {}
 
-let userData:{ [id: string]: User } = {};
+let userData: { [id: string]: User } = {};
 
 
 class TransactionList extends React.Component<Props, State> {
@@ -37,10 +37,10 @@ class TransactionList extends React.Component<Props, State> {
   }
 
   getPhoneNumber = (id: string) => {
-    if (Object.keys(this.state.userData).length === 0) {
-      return ""
-    } else {
+    if (id in this.state.userData) {
       return this.state.userData[id].phone
+    } else {
+      return ""
     }
   }
 
@@ -51,7 +51,7 @@ class TransactionList extends React.Component<Props, State> {
     let ampm = hours >= 12 ? 'pm' : 'am';
     hours = hours % 12;
     hours = hours ? hours : 12; // the hour '0' should be '12'
-    let minuteString = minutes < 10 ? '0'+ minutes : minutes;
+    let minuteString = minutes < 10 ? '0' + minutes : minutes;
     let strTime = hours + ':' + minuteString + ' ' + ampm;
     return datetime.getDate() + "/" + datetime.getMonth() + "/" + datetime.getFullYear() + " " + strTime
   }
@@ -64,7 +64,7 @@ class TransactionList extends React.Component<Props, State> {
             ${transaction.totalPrice.toFixed(2)}
           </List.Content>
           <List.Content floated='left'>
-          <List.Header>{this.getDate(transaction.dateTime)} </List.Header>
+            <List.Header>{this.getDate(transaction.dateTime)} </List.Header>
             <p>{this.getPhoneNumber(transaction.awsId)}</p>
           </List.Content>
           <List.Header>
@@ -99,8 +99,10 @@ class TransactionList extends React.Component<Props, State> {
                   ${item['price'].toFixed(2)}
                 </List.Content>
                 <List.Content>
-                  {item['name']}
+                  <List.Header>{item['name']}</List.Header>
+                  {item['stallId']}
                 </List.Content>
+                <Divider />
               </List.Item>
             ))}
           </List>

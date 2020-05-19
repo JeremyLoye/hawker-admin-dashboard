@@ -25,6 +25,7 @@ interface Options {
 
 type Props = {
   pathName: string;
+  meal: string;
 }
 
 type State = {
@@ -38,7 +39,7 @@ class StoreList extends React.Component<Props, State> {
   state = {
     hawkerCodes: [],
     hawker: '',
-    meal: '',
+    meal: this.props.meal,
     isAvailable: true
   }
 
@@ -49,53 +50,53 @@ class StoreList extends React.Component<Props, State> {
   renderCards = (listing: Listing, date: Moment) => {
     return listing.stalls.map((stall: Stall) => (
       <Popup
-      content={"Stall set to not available for this day"}
-      disabled={stall.available}
-      inverted
-      on='click'
-      key={`${stall.stallId}`}
-      trigger = {
-        <Card
-          as={Link}
-          to={`${this.props.pathName}/stall/${stall.stallId}`}
-          key={stall.stallId + " " + date.format("DDMMYYYY")}
-          childKey={stall.stallId + " " + date.format("DDMMYYYY")}
-          image={stall.image}
-          header={stall.name}
-          meta={stall.stallId}
-          fluid={true}
-          onClick={
-            (event: React.MouseEvent<HTMLElement>, data: CardProps) => {
-              if (!stall.available) {
-                event.preventDefault();
-              }
-            }
-          }
-          extra={
-            <Radio
-              key={stall.stallId + " " + date.format("DDMMYYYY")}
-              label="Availability"
-              checked={stall.available}
-              toggle
-              floated="right"
-              onChange={
-                async (event: React.FormEvent<HTMLElement>, data: CheckboxProps) => {
+        content={"Stall set to not available for this day"}
+        disabled={stall.available}
+        inverted
+        on='click'
+        key={`${stall.stallId}`}
+        trigger={
+          <Card
+            as={Link}
+            to={`${this.props.pathName}/stall/${stall.stallId}`}
+            key={stall.stallId + " " + date.format("DDMMYYYY")}
+            childKey={stall.stallId + " " + date.format("DDMMYYYY")}
+            image={stall.image}
+            header={stall.name}
+            meta={stall.stallId}
+            fluid={true}
+            onClick={
+              (event: React.MouseEvent<HTMLElement>, data: CardProps) => {
+                if (!stall.available) {
                   event.preventDefault();
-                  let stallId = stall.stallId;
-                  let isAvailable: any = data.checked;
-                  stall.available = isAvailable;
-                  this.changeChecked(isAvailable)
-                  let body = {
-                    "stallId": stallId,
-                    "available": isAvailable
-                  }
-                  console.log(body)
-                  await API.post(`/listings/${date.format("DDMMYYYY")}/availability`, body)
                 }
               }
-            />} />
-          }
-          />
+            }
+            extra={
+              <Radio
+                key={stall.stallId + " " + date.format("DDMMYYYY")}
+                label="Availability"
+                checked={stall.available}
+                toggle
+                floated="right"
+                onChange={
+                  async (event: React.FormEvent<HTMLElement>, data: CheckboxProps) => {
+                    event.preventDefault();
+                    let stallId = stall.stallId;
+                    let isAvailable: any = data.checked;
+                    stall.available = isAvailable;
+                    this.changeChecked(isAvailable)
+                    let body = {
+                      "stallId": stallId,
+                      "available": isAvailable
+                    }
+                    console.log(body)
+                    await API.post(`/listings/${date.format("DDMMYYYY")}/availability`, body)
+                  }
+                }
+              />} />
+        }
+      />
     ))
   }
 
@@ -140,42 +141,15 @@ class StoreList extends React.Component<Props, State> {
         value: hawkerCode.code
       })
     });
-    let mealOptions = [
-      {
-        key: 'lunch',
-        text: 'lunch',
-        value: 'lunch'
-      },
-      {
-        key: 'dinner',
-        text: 'dinner',
-        value: 'dinner'
-      }
-    ]
     return (
-      <Grid columns='two' fluid style={{ paddingBottom: '1em' }}>
-        <Grid.Column width={11}>
-          <Dropdown
-            placeholder='Select Hawker Centre'
-            fluid
-            className="huge"
-            selection
-            options={options}
-            onChange={this.onHawkerSelect}
-          />
-        </Grid.Column>
-
-        <Grid.Column width={5}>
-          <Dropdown
-            placeholder='Select Meals'
-            fluid
-            className="huge"
-            selection
-            options={mealOptions}
-            onChange={this.onMealSelect}
-          />
-        </Grid.Column>
-      </Grid>
+      <Dropdown
+        placeholder='Select Hawker Centre'
+        fluid
+        className="huge"
+        selection
+        options={options}
+        onChange={this.onHawkerSelect}
+      />
     )
   }
 

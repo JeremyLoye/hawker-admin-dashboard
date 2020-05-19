@@ -31,6 +31,7 @@ export interface Food {
 }
 
 export interface CartItem {
+  id: string;
   stallId: string;
   name: string;
   price: number;
