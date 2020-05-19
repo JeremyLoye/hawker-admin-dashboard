@@ -1,6 +1,6 @@
 import 'react-dates/initialize';
 import React from "react";
-import { Container, Transition, Grid, Radio, Dropdown, DropdownProps } from "semantic-ui-react";
+import { Container, Transition, Grid, Radio, Dropdown, DropdownProps, List, Modal, Button, Divider, ButtonProps } from "semantic-ui-react";
 import { Link, RouteComponentProps } from 'react-router-dom';
 import moment, { Moment } from 'moment';
 import { SingleDatePicker } from 'react-dates';
@@ -8,10 +8,6 @@ import { SingleDatePicker } from 'react-dates';
 import API from "../../components/axiosapi";
 
 import { Transaction, User } from "../../components/interfaces";
-
-import { TransactionContext } from "../../components/appcontexts";
-
-import TransactionList from "../../components/transactionlist"
 
 import 'react-dates/lib/css/_datepicker.css';
 
@@ -32,6 +28,8 @@ type Props = RouteComponentProps & {
 
 const transactions: Transaction[] = [];
 
+let userData: { [id: string]: User } = {};
+
 class Transactions extends React.Component<Props, State> {
   state = {
     focused: false,
@@ -39,32 +37,12 @@ class Transactions extends React.Component<Props, State> {
     transactions: transactions,
     visible: false,
     filter: 'all',
-    filteredTransactions: transactions,
     mealType: 'lunch',
-    update: () => {
-      this.props.history.push(`/dashboard/transactions/${this.state.date.format("DDMMYYYY")}`)
-      this.setState({ visible: false })
-      this.fetchTransactions(this.state.date).then((res: any) => {
-        if (res['data']['transactions'] == null) { 
-          this.setState({ transactions: [] })
-        } else {
-          this.setState({ transactions: res['data']['transactions'] })
-        }
-        this.setState({ visible: true })
-      })
-    }
+    userData: userData
   }
 
   componentDidMount() {
-    this.setState({ date: moment(this.props.match.params.date, "DDMMYYYY") })
-    this.fetchTransactions(this.state.date).then((res: any) => {
-      if (res['data']['transactions'] == null) { 
-        this.setState({ transactions: [] })
-      } else {
-        this.setState({ transactions: res['data']['transactions'] })
-      }
-      this.setState({ visible: true })
-    })
+    this.fetchTransactions(this.state.date, this.state.mealType)
   }
 
 
@@ -73,43 +51,40 @@ class Transactions extends React.Component<Props, State> {
       this.props.history.push(`/dashboard/transactions/${date.format("DDMMYYYY")}`)
       this.setState({ date })
       this.setState({ visible: false })
-      this.fetchTransactions(date).then((res: any) => {
-        if (res['data']['transactions'] == null) { 
-          this.setState({ transactions: [] })
-        } else {
-          this.setState({ transactions: res['data']['transactions'] })
-        }
-        this.setState({ visible: true })
-      })
+      this.fetchTransactions(date, this.state.mealType)
     }
   }
 
-  selectMealType = async (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps) => {
+  selectMealType = (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps) => {
     let mealString: any = data.value
-    if(mealString !== this.state.mealType) {
-      await this.setState({ mealType: mealString })
-      this.fetchTransactions(this.state.date).then((res: any) => {
-        this.setState({ transactions: res['data']['transactions'] })
-        this.setState({ visible: true })
-      })
+    if (mealString !== this.state.mealType) {
+      this.setState({ visible: false })
+      this.setState({ mealType: mealString })
+      this.fetchTransactions(this.state.date, mealString)
     }
   }
-  
+
   filterChange = (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps) => {
     let filterString: any = data.value
-    if(filterString !== this.state.filter) {
-      this.setState({filter: filterString})
-      this.setState({ visible: false })
-      if (filterString !== "all") { 
-        this.setState({ filteredTransactions: this.filterTransactions(filterString === "paid") })
-      }
-      this.setState({ visible: true })
+    if (filterString !== this.state.filter) {
+      this.setState({ filter: filterString })
     }
   }
 
-  fetchTransactions = (date: Moment) => {
-    let promise: Promise<Transaction[]> = API.post('/transactions/datemeal/' + date.format("DDMMYYYY") + `/${this.state.mealType}`);
-    return promise;
+  fetchTransactions = (date: Moment, mealType: string) => {
+    API.post('/transactions/datemeal/' + date.format("DDMMYYYY") + `/${mealType}`).then((res: any) => {
+      let transactions: Transaction[] = res['data']['transactions']
+      this.setState({ transactions: transactions })
+      this.setState({ visible: true })
+      transactions.forEach(el => {
+        API.post(`/users/${el.awsId}`).then(res => {
+          let newUserData: any = this.state.userData
+          newUserData[el.awsId] = res["data"]
+          this.setState({ userData: newUserData })
+          this.setState({visible: true})
+        })
+      })
+    })
   }
 
   filterTransactions = (filterPaid: boolean) => {
@@ -124,86 +99,192 @@ class Transactions extends React.Component<Props, State> {
     return filteredTransactions
   }
 
+  getPhoneNumber = (id: string) => {
+    if (id in this.state.userData) {
+      return this.state.userData[id].phone
+    } else {
+      return ""
+    }
+  }
+
+  getDate = (date: string) => {
+    let datetime = new Date(date)
+    let hours = datetime.getHours();
+    let minutes = datetime.getMinutes();
+    let ampm = hours >= 12 ? 'pm' : 'am';
+    hours = hours % 12;
+    hours = hours ? hours : 12; // the hour '0' should be '12'
+    let minuteString = minutes < 10 ? '0' + minutes : minutes;
+    let strTime = hours + ':' + minuteString + ' ' + ampm;
+    return datetime.getDate() + "/" + datetime.getMonth() + "/" + datetime.getFullYear() + " " + strTime
+  }
+
+  postToggledTransaction = (id: string, isPaid: boolean) => {
+    const body = {
+      "_id": id,
+      "paid": isPaid
+    }
+    API.post(`transactions/update`, body)
+  }
+  
+  getButtonText = (isPaid: boolean) => {
+    return isPaid ? "Paid" : "Unpaid"
+  }
+
+  renderList = () => {
+    let transactions: Transaction[] = this.state.transactions;
+    if (this.state.filter !== 'all') {
+      transactions = this.filterTransactions(this.state.filter === 'paid')
+    }
+    return transactions.map((transaction: Transaction) => (
+      <Modal trigger={
+        <List.Item>
+          <List.Content floated="right">
+            ${transaction.totalPrice.toFixed(2)}
+          </List.Content>
+          <List.Content floated='left'>
+            <List.Header>{this.getDate(transaction.dateTime)} </List.Header>
+            <p>{this.getPhoneNumber(transaction.awsId)}</p>
+          </List.Content>
+          <List.Header>
+            {transaction.paymentUsername} ({transaction.paymentMethod})
+        </List.Header>
+          <List.Content floated="right">
+            <Button
+              toggle
+              style={{ background: 'red', color: 'white' }}
+              active={transaction.paid}
+              onClick={
+                (event: React.MouseEvent<HTMLButtonElement>, data: ButtonProps) => {
+                  event.stopPropagation();
+                  transaction.paid = !transaction.paid
+                  this.postToggledTransaction(transaction._id, transaction.paid)
+                  this.forceUpdate()
+                }
+              }>
+              {this.getButtonText(transaction.paid)}
+            </Button>
+          </List.Content>
+        </ List.Item>
+      }>
+        <Modal.Header>
+          Order on {moment(transaction.date, "DDMMYYYY").format("DD-MM-YYYY")} ({transaction.meal})
+          </Modal.Header>
+        <Modal.Content>
+          <List ordered>
+            {transaction.cart.map((item) => (
+              <List.Item>
+                <List.Content floated='right'>
+                  ${item['price'].toFixed(2)}
+                </List.Content>
+                <List.Content>
+                  <List.Header>{item['name']}</List.Header>
+                  {item['stallId']}
+                </List.Content>
+                <Divider />
+              </List.Item>
+            ))}
+          </List>
+          <Divider />
+          <List>
+            <List.Item>
+              <List.Content floated="right">
+                ${transaction.totalPrice.toFixed(2)}
+              </List.Content>
+              <List.Content>
+                Total Cost:
+              </List.Content>
+            </List.Item>
+          </List>
+        </Modal.Content>
+      </Modal>
+    ))
+  }
+
+  renderTransactions = () => {
+    return <List relaxed animated selection divided>
+      {this.renderList()}
+    </List>
+  }
+
   render() {
     return (
       <div>
         <Grid columns='two' fluid>
-            <Grid.Column width={8}>
-          <p className="lead">
-            View transactions on:
+          <Grid.Column width={8}>
+            <p className="lead">
+              View transactions on:
           <SingleDatePicker
-              id="2"
-              orientation="horizontal"
-              anchorDirection="right"
-              date={this.state.date}
-              onDateChange={(date) => { if (date) { this.dateChange(date) } }}
-              focused={this.state.focused}
-              onFocusChange={({ focused }) => this.setState({ focused })}
-              numberOfMonths={1}
-              isOutsideRange={()=>false}
-              displayFormat="DD/MM/YYYY"
-              small={true}>
-            </SingleDatePicker>
-          </p>
+                id="2"
+                orientation="horizontal"
+                anchorDirection="right"
+                date={this.state.date}
+                onDateChange={(date) => { if (date) { this.dateChange(date) } }}
+                focused={this.state.focused}
+                onFocusChange={({ focused }) => this.setState({ focused })}
+                numberOfMonths={1}
+                isOutsideRange={() => false}
+                displayFormat="DD/MM/YYYY"
+                small={true}>
+              </SingleDatePicker>
+            </p>
           </Grid.Column>
           <Grid.Column width={4}>
-          <Dropdown
-            key={1}
-            placeholder='Meal Type'
-            fluid
-            className="huge"
-            selection
-            defaultValue='lunch'
-            options={[
-              {
-                key: 'lunch',
-                text: 'Lunch',
-                value: 'lunch'
-              },
-              {
-                key: 'dinner',
-                text: 'Dinner',
-                value: 'dinner'
-              }
-            ]}
-            onChange={this.selectMealType}
-          />
+            <Dropdown
+              key={1}
+              placeholder='Meal Type'
+              fluid
+              className="huge"
+              selection
+              defaultValue='lunch'
+              options={[
+                {
+                  key: 'lunch',
+                  text: 'Lunch',
+                  value: 'lunch'
+                },
+                {
+                  key: 'dinner',
+                  text: 'Dinner',
+                  value: 'dinner'
+                }
+              ]}
+              onChange={this.selectMealType}
+            />
           </Grid.Column>
           <Grid.Column width={4}>
-          <Dropdown
-            key={2}
-            placeholder='Filter'
-            fluid
-            className="huge"
-            selection
-            options={[
-              {
-                key: 'all',
-                text: 'All',
-                value: 'all'
-              },
-              {
-                key: 'paid',
-                text: 'Paid',
-                value: 'paid'
-              },
-              {
-                key: 'upaid',
-                text: 'Unpaid',
-                value: 'unpaid'
-              }
-            ]}
-            onChange={this.filterChange}
-          />
+            <Dropdown
+              key={2}
+              placeholder='Filter'
+              fluid
+              className="huge"
+              selection
+              options={[
+                {
+                  key: 'all',
+                  text: 'All',
+                  value: 'all'
+                },
+                {
+                  key: 'paid',
+                  text: 'Paid',
+                  value: 'paid'
+                },
+                {
+                  key: 'upaid',
+                  text: 'Unpaid',
+                  value: 'unpaid'
+                }
+              ]}
+              onChange={this.filterChange}
+            />
           </Grid.Column>
-          </Grid>
-          <Transition visible={this.state.visible} animation='scale' duration={500}>
+        </Grid>
+        <Transition visible={this.state.visible} animation='scale' duration={500}>
           <div>
-          <TransactionContext.Provider value={this.state}>
-           <TransactionList pathName={this.props.match.url}/>
-          </TransactionContext.Provider>
+            {this.renderTransactions()}
           </div>
-          </Transition>
+        </Transition>
       </div>
     );
   }
