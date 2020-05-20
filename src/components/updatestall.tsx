@@ -22,6 +22,7 @@ class UpdateStall extends React.Component<Props> {
         activeFoodItem: this.props.stall.food.length>0 ? 1 : 0,
         newFoodItemName: "",
         newFoodItemPrice: 0,
+        newFoodItemMargin: 0,
         newFoodItemDescription: "",
         newFoodItemImage: "",
         portal: false,
@@ -58,6 +59,15 @@ class UpdateStall extends React.Component<Props> {
         this.state.food.forEach((food, index) => {
             if (food.id === this.state.activeFoodItem) {
                 foodList[index]['price'] = parseFloat(data.value)
+            }
+        })
+        this.setState({food: foodList})
+    }
+    handleFoodMarginChange = (event: React.SyntheticEvent<HTMLElement>, data: InputProps) => {
+        const foodList = this.state.food
+        this.state.food.forEach((food, index) => {
+            if (food.id === this.state.activeFoodItem) {
+                foodList[index]['margin'] = parseFloat(data.value)
             }
         })
         this.setState({food: foodList})
@@ -100,6 +110,9 @@ class UpdateStall extends React.Component<Props> {
     handleNewFoodPriceChange = (event: React.SyntheticEvent<HTMLElement>, data: InputProps) => {
         this.setState({newFoodItemPrice: parseFloat(data.value)})
     }
+    handleNewFoodMarginChange = (event: React.SyntheticEvent<HTMLElement>, data: InputProps) => {
+        this.setState({newFoodItemMargin: parseFloat(data.value)})
+    }
     handleNewFoodDescriptionChange = (event: React.SyntheticEvent<HTMLElement>, data: InputProps) => {
         this.setState({newFoodItemDescription: data.value})
     }
@@ -116,6 +129,7 @@ class UpdateStall extends React.Component<Props> {
             id: newId,
             name: this.state.newFoodItemName,
             price: this.state.newFoodItemPrice,
+            margin: this.state.newFoodItemMargin,
             description: this.state.newFoodItemDescription,
             image: this.state.newFoodItemImage,
             available: true
@@ -124,6 +138,7 @@ class UpdateStall extends React.Component<Props> {
             food: foodList,
             newFoodItemName: "",
             newFoodItemPrice: 0,
+            newFoodItemMargin: 0,
             newFoodItemDescription: "",
             newFoodItemImage: ""
         })
@@ -202,7 +217,6 @@ class UpdateStall extends React.Component<Props> {
     deleteStall = (event: React.SyntheticEvent<HTMLElement>, data: ButtonProps) => {
         const promise: Promise<any> = API.post(`/stalls/${this.state.stallId}/delete`)
         promise.then((res)=>{
-            console.log(res)
             if ("success" in res['data']) {
                 window.location.reload(false);
             }
@@ -299,17 +313,26 @@ class UpdateStall extends React.Component<Props> {
                             </Form.Group>
                             <Form.Group widths='equal'>
                                 <Form.Field
-                                    value={this.state.food[this.state.activeFoodItem-1]['description']}
+                                    value={this.state.food[this.state.activeFoodItem-1]['margin']}
                                     control={Input}
-                                    label="Food Description"
-                                    placeholder="Description"
-                                    onChange={this.handleFoodDescriptionChange}/>
+                                    label="Margin"
+                                    placeholder="$"
+                                    onChange={this.handleFoodMarginChange}
+                                    type='number'/>
                                 <Form.Field
                                     value={this.state.food[this.state.activeFoodItem-1]['image']}
                                     control={Input}
                                     label="Food Image URL"
                                     placeholder="Image URL"
                                     onChange={this.handleFoodImageChange}/>
+                            </Form.Group>
+                            <Form.Group widths='equal'>
+                                <Form.Field
+                                    value={this.state.food[this.state.activeFoodItem-1]['description']}
+                                    control={Input}
+                                    label="Food Description"
+                                    placeholder="Description"
+                                    onChange={this.handleFoodDescriptionChange}/>
                             </Form.Group>
                         </Grid.Column>
                     </Grid> : <h2>There are no food items registered currently</h2> }
@@ -338,17 +361,26 @@ class UpdateStall extends React.Component<Props> {
                             </Form.Group>
                             <Form.Group widths='equal'>
                                 <Form.Field
-                                    value={this.state.newFoodItemDescription}
+                                    value={this.state.newFoodItemMargin}
                                     control={Input}
-                                    label="Food Description"
-                                    placeholder="Description"
-                                    onChange={this.handleNewFoodDescriptionChange}/>
+                                    label="Margin"
+                                    placeholder="$"
+                                    onChange={this.handleNewFoodMarginChange}
+                                    type='number'/>
                                 <Form.Field
                                     value={this.state.newFoodItemImage}
                                     control={Input}
                                     label="Food Image URL"
                                     placeholder="Image URL"
                                     onChange={this.handleNewFoodImageChange}/>
+                            </Form.Group>
+                            <Form.Group widths='equal'>
+                                <Form.Field
+                                    value={this.state.newFoodItemDescription}
+                                    control={Input}
+                                    label="Food Description"
+                                    placeholder="Description"
+                                    onChange={this.handleNewFoodDescriptionChange}/>
                             </Form.Group>
                         </Grid.Column>
                     </Grid>
