@@ -1,5 +1,5 @@
 import React from "react";
-import { InputProps, List, Segment, Grid, Header, Divider, Form, Input, Container, Button, DropdownProps, Dropdown, ButtonProps, TransitionablePortal } from 'semantic-ui-react';
+import { Message, InputProps, List, Segment, Grid, Header, Divider, Form, Input, Container, Button, DropdownProps, Dropdown, ButtonProps, TransitionablePortal } from 'semantic-ui-react';
 import API from './axiosapi';
 
 type Props = {
@@ -25,8 +25,20 @@ class AddStall extends React.Component<Props> {
         newFoodItemDescription: "",
         newFoodItemImage: "",
         portal: false,
+        portalMessage: {
+            header: "",
+            message: ""
+        },
         aboutImage: "",
-        aboutUrl: ""
+        aboutUrl: "",
+        existingStallNo: [],
+        stallNoWarning: false
+    }
+
+    componentDidMount() {
+        API.get('stallcodes/'+this.state.location).then(res => {
+            this.setState({existingStallNo: res['data']['stalls'].map((stall: any) => stall['stallNo'])})
+        })
     }
 
     handleNameChange = (event: React.SyntheticEvent<HTMLElement>, data: InputProps) => {
@@ -36,6 +48,19 @@ class AddStall extends React.Component<Props> {
         this.setState({image: data.value})
     }
     handleStallNoChange = (event: React.SyntheticEvent<HTMLElement>, data: InputProps) => {
+        let stallNo: string = data.value
+        let existingStalls: string[] = this.state.existingStallNo
+        if (stallNo.substring(0,1) === "#") {
+            stallNo = stallNo.substring(1,)
+        }
+        if (existingStalls.includes(stallNo) && !this.state.stallNoWarning) {
+            this.setState({stallNoWarning: true})
+        } else if (this.state.stallNoWarning) {
+            if (!existingStalls.includes(stallNo)) {
+                this.setState({stallNoWarning: false})
+            }
+        }
+
         this.setState({stallNo: data.value})
     }
     handleTypeChange = (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps) => {
@@ -215,8 +240,32 @@ class AddStall extends React.Component<Props> {
         const promise: Promise<any> = API.post('/stalls/insert', newStall)
         promise.then((res)=>{
             if ("success" in res['data']) {
-                this.setState({portal: true})
+                this.setState({
+                    portal: true,
+                    portalMessage: {
+                        header: "Successfully Added",
+                        message: `${this.state.name} has been added`
+                    }
+                })
                 window.location.reload(false);
+            } else {
+                if ("error" in res['data']) {
+                    this.setState({
+                        portalMessage: {
+                            header: "Unsuccessful: An error has occured",
+                            message: res['data']['error']
+                        },
+                        portal: true
+                    })
+                } else {
+                    this.setState({
+                        portalMessage: {
+                            header: "Unsuccessful: An error has occured",
+                            message: res['data']['error']
+                        },
+                        portal: true
+                    })
+                }
             }
         })
     }
@@ -251,12 +300,17 @@ class AddStall extends React.Component<Props> {
                             placeholder='Location'/>
                         <Form.Field
                             required
+                            error={this.state.stallNoWarning
+                                ?<Message attached='bottom' negative>
+                                    Stall with this unit number already exists for this hawker!
+                                </Message>:false}
                             value={`${this.state.stallNo}`}
                             control={Input}
                             label='Stall Unit Number'
                             placeholder='Stall #'
                             onChange={this.handleStallNoChange}>
                             </Form.Field>
+                            
                     </Form.Group>
                     <Dropdown
                         placeholder='Stall Type'
@@ -479,13 +533,15 @@ class AddStall extends React.Component<Props> {
                     </Form.Group>
                     <TransitionablePortal open={this.state.portal}>
                         <Segment style={{ left: '45%', position: 'fixed', bottom: '5%', zIndex: 1000 }}>
-                            <Header>Successfully Updated</Header>
-                            <p>{this.state.name} has been updated</p>
+                            <Header>{this.state.portalMessage['header']}</Header>
+                                <p>{this.state.portalMessage['message']}</p>
                         </Segment>
                     </TransitionablePortal>
+                    <Divider hidden/>
+                    <Divider />
                     <Button disabled={
-                        this.state.name==="" || this.state.food.length <= 0 || this.state.stallNo===""
-                    } onClick={this.addStall} positive>Add</Button>
+                        this.state.name==="" || this.state.food.length <= 0 || this.state.stallNo==="" || this.state.stallNoWarning
+                    } onClick={this.addStall} positive>Add Stall</Button>
                     <Divider hidden/>
                 </Form>
                 
