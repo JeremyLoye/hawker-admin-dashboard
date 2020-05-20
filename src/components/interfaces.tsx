@@ -35,6 +35,7 @@ export interface CartItem {
   stallId: string;
   name: string;
   price: number;
+  margin: number;
   quantity: number;
 }
 

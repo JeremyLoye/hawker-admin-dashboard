@@ -7,7 +7,7 @@ import { SingleDatePicker } from 'react-dates';
 
 import API from "../../components/axiosapi";
 
-import { Transaction, User } from "../../components/interfaces";
+import { Transaction, User, CartItem } from "../../components/interfaces";
 
 import 'react-dates/lib/css/_datepicker.css';
 
@@ -43,6 +43,15 @@ class Transactions extends React.Component<Props, State> {
 
   componentDidMount() {
     this.fetchTransactions(this.state.date, this.state.mealType)
+  }
+
+  marginTotal = (cart: CartItem[]) => {
+    let cost = 0;
+    let el;
+    for (el of cart) {
+      cost += (el.margin | 0) * el.quantity;
+    }
+    return cost;
   }
 
 
@@ -81,7 +90,7 @@ class Transactions extends React.Component<Props, State> {
           let newUserData: any = this.state.userData
           newUserData[el.awsId] = res["data"]
           this.setState({ userData: newUserData })
-          this.setState({visible: true})
+          this.setState({ visible: true })
         })
       })
     })
@@ -126,7 +135,7 @@ class Transactions extends React.Component<Props, State> {
     }
     API.post(`transactions/update`, body)
   }
-  
+
   getButtonText = (isPaid: boolean) => {
     return isPaid ? "Paid" : "Unpaid"
   }
@@ -175,7 +184,8 @@ class Transactions extends React.Component<Props, State> {
             {transaction.cart.map((item) => (
               <List.Item>
                 <List.Content floated='right'>
-                  ${item['price'].toFixed(2)}
+                  <List.Header>${item['price'].toFixed(2)}</List.Header>
+                  ${(item['margin'] | 0).toFixed(2)}
                 </List.Content>
                 <List.Content>
                   <List.Header>{item['name']}</List.Header>
@@ -187,6 +197,15 @@ class Transactions extends React.Component<Props, State> {
           </List>
           <Divider />
           <List>
+            <List.Item>
+              <List.Content floated="right">
+                ${this.marginTotal(transaction.cart).toFixed(2)}
+              </List.Content>
+              <List.Content>
+                Service Fee:
+              </List.Content>
+            </List.Item>
+            <Divider />
             <List.Item>
               <List.Content floated="right">
                 ${transaction.totalPrice.toFixed(2)}
