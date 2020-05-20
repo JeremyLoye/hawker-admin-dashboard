@@ -9,6 +9,7 @@ import { Moment } from 'moment';
 type Props = {
   listing: Listing;
   date: Moment;
+  meal: string;
   match: {
     params: {
       stallId: string;
@@ -46,7 +47,6 @@ class FoodList extends React.Component<Props> {
                     placeholder={`${el.quantity}`}
                     onChange={
                       (event: React.FormEvent<HTMLInputElement>, data: InputOnChangeData) => {
-                        console.log(data.value)
                         let quantity = Number(data.value)
                         el.quantity = quantity
                       }
@@ -66,7 +66,8 @@ class FoodList extends React.Component<Props> {
                               const body = {
                                 "stallId": stall.stallId,
                                 "foodId": el.id,
-                                "quantity": el.quantity
+                                "quantity": el.quantity,
+                                "meal": this.props.meal
                               }
                               API.post(`listings/${this.props.date.format("DDMMYYYY")}/quantity`, body)
                               this.forceUpdate()
