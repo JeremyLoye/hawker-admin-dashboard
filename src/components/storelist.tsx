@@ -95,7 +95,6 @@ class StoreList extends React.Component<Props, State> {
                       "meal": this.state.meal,
                       "zone": this.state.zone
                     }
-                    console.log(body)
                     await API.post(`/listings/${date.format("DDMMYYYY")}/availability`, body)
                   }
                 }
@@ -111,18 +110,17 @@ class StoreList extends React.Component<Props, State> {
     return promise;
   }
 
-  postHawkerChoice = async (date: Moment) => {
+  postHawkerChoice = async (date: Moment, meal: string, zone: string) => {
     const body = {
       "code": this.state.hawker,
-      "meal": this.state.meal,
-      "zone": this.state.zone
+      "meal": meal,
+      "zone": zone
     }
-    console.log(body)
-    API.post(`/listings/${date.format("DDMMYYYY")}/add`, body).then(res => console.log(res))
+    await API.post(`/listings/${date.format("DDMMYYYY")}/add`, body)
   }
 
-  deleteHawkerChoice = async (date: Moment) => {
-    await API.post(`/listings/${date.format("DDMMYYYY")}/${this.state.meal}/${this.state.zone}/delete`)
+  deleteHawkerChoice = async (date: Moment, meal: string, zone: string) => {
+    await API.post(`/listings/${date.format("DDMMYYYY")}/${meal}/${zone}/delete`)
   }
 
   onHawkerSelect = (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps) => {
@@ -160,7 +158,7 @@ class StoreList extends React.Component<Props, State> {
     )
   }
 
-  renderListing = (listing: Listing | null, date: Moment, update: () => void) => {
+  renderListing = (listing: Listing | null, date: Moment, update: () => void, meal: string, zone: string) => {
     if (listing == null) {
       return (
         <React.Fragment>
@@ -172,7 +170,7 @@ class StoreList extends React.Component<Props, State> {
               this.state.meal === ''
             }
             onClick={() => {
-              this.postHawkerChoice(date).then(res => update())
+              this.postHawkerChoice(date, meal, zone).then(res => update())
             }}>
             Select
           </Button>
@@ -189,7 +187,7 @@ class StoreList extends React.Component<Props, State> {
               <Button
                 floated="right"
                 onClick={() => {
-                  this.deleteHawkerChoice(date).then(res => update())
+                  this.deleteHawkerChoice(date, meal, zone).then(res => update())
                 }}>
                 X
               </Button>
@@ -207,10 +205,10 @@ class StoreList extends React.Component<Props, State> {
   render() {
     return (
       <ListingContext.Consumer>
-        {({ date, listing, update }) => (
+        {({ date, listing, update, meal, zone }) => (
           <React.Fragment>
             <Route exact path={`${this.props.pathName}`}>
-              {this.renderListing(listing, date, update)}
+              {this.renderListing(listing, date, update, meal, zone)}
             </Route>
             <Route path={`${this.props.pathName}/stall/:stallId`} render={(props) => <FoodList zone={this.state.zone} meal={this.state.meal} date={date} listing={listing!} {...props} />} />
 

@@ -50,7 +50,7 @@ class Transactions extends React.Component<Props, State> {
     let cost = 0;
     let el;
     for (el of cart) {
-      cost += (el.margin | 0) * el.quantity;
+      cost += el.margin * el.quantity;
     }
     return cost;
   }
@@ -196,17 +196,16 @@ class Transactions extends React.Component<Props, State> {
               <List.Item>
                 <List.Content floated='right'>
                   <List.Header>${item['price'].toFixed(2)}</List.Header>
-                  ${(item['margin'] | 0).toFixed(2)}
+                  ${(item['margin']).toFixed(2)}
                 </List.Content>
                 <List.Content>
-                  <List.Header>{item['name']}</List.Header>
+                  <List.Header>{item['quantity']}x {item['name']}</List.Header>
                   {item['stallId']}
                 </List.Content>
                 <Divider />
               </List.Item>
             ))}
           </List>
-          <Divider />
           <List>
             <List.Item>
               <List.Content floated="right">
