@@ -341,7 +341,7 @@ class UpdateStall extends React.Component<Props> {
                     </Divider>
                     <Grid columns={2}>
                         <Grid.Column width={6} verticalAlign="middle">
-                            <Button onClick={this.addFoodItem} positive>Add</Button>
+                            <Button disabled={this.state.newFoodItemName.length===0} onClick={this.addFoodItem} positive>Add</Button>
                         </Grid.Column>
                         <Grid.Column width={10}>
                             <Form.Group widths='equal'>
@@ -489,9 +489,11 @@ class UpdateStall extends React.Component<Props> {
                             <p>{this.state.name} has been updated</p>
                         </Segment>
                     </TransitionablePortal>
+                    <Divider hidden/>
+                    <Divider />
                     <Button disabled={
                         this.state.name==="" || this.state.food.length <= 0
-                    } onClick={this.submitUpdates} positive>Update</Button>
+                    } onClick={this.submitUpdates} positive>Update Stall</Button>
                     <Divider hidden/>
                 </Form>
                 

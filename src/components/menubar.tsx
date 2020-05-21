@@ -48,12 +48,12 @@ class SideMenu extends Component<Props, State> {
                   Daily Listing
                 </Menu.Item>
               </Link>
-              <Link to={`${this.props.pathName}/hawker`}>
+              {/* <Link to={`${this.props.pathName}/hawker`}>
                 <Menu.Item as='a' active={this.state.activeItem === 'hawker'}
                   onClick={() => this.setState({ activeItem: 'hawker' })}>
                   Hawker
                 </Menu.Item>
-              </Link>
+              </Link> */}
 
               <Link to={`${this.props.pathName}/stall`}>
                 <Menu.Item as='a' active={this.state.activeItem === 'store'}
