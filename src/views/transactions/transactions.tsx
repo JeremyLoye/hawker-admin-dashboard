@@ -291,9 +291,9 @@ class Transactions extends React.Component<Props, State> {
               selection
               options={[
                 {
-                  key: 'Cinamon',
-                  text: 'Cinamon',
-                  value: 'Cinamon'
+                  key: 'Cinnamon',
+                  text: 'Cinnamon',
+                  value: 'Cinnamon'
                 },
                 {
                   key: 'Tembusu',

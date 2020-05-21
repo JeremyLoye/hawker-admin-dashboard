@@ -139,9 +139,9 @@ class DailyListing extends React.Component<Props, State> {
         value: 'Tembusu'
       },
       {
-        key: 'Cinamon',
-        text: 'Cinamon',
-        value: 'Cinamon'
+        key: 'Cinnamon',
+        text: 'Cinnamon',
+        value: 'Cinnamon'
       }
     ]
 
