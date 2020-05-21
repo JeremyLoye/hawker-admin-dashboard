@@ -26,12 +26,14 @@ interface Options {
 type Props = {
   pathName: string;
   meal: string;
+  zone: string;
 }
 
 type State = {
   hawkerCodes: HawkerCode[];
   hawker: string;
   meal: string;
+  zone: string;
   isAvailable: boolean;
 }
 
@@ -40,6 +42,7 @@ class StoreList extends React.Component<Props, State> {
     hawkerCodes: [],
     hawker: '',
     meal: this.props.meal,
+    zone: this.props.zone,
     isAvailable: true
   }
 
@@ -89,8 +92,10 @@ class StoreList extends React.Component<Props, State> {
                     let body = {
                       "stallId": stallId,
                       "available": isAvailable,
-                      "meal": this.state.meal
+                      "meal": this.state.meal,
+                      "zone": this.state.zone
                     }
+                    console.log(body)
                     await API.post(`/listings/${date.format("DDMMYYYY")}/availability`, body)
                   }
                 }
@@ -109,13 +114,15 @@ class StoreList extends React.Component<Props, State> {
   postHawkerChoice = async (date: Moment) => {
     const body = {
       "code": this.state.hawker,
-      "meal": this.state.meal
+      "meal": this.state.meal,
+      "zone": this.state.zone
     }
-    await API.post(`/listings/${date.format("DDMMYYYY")}/add`, body)
+    console.log(body)
+    API.post(`/listings/${date.format("DDMMYYYY")}/add`, body).then(res => console.log(res))
   }
 
   deleteHawkerChoice = async (date: Moment) => {
-    await API.post(`/listings/${date.format("DDMMYYYY")}/delete`)
+    await API.post(`/listings/${date.format("DDMMYYYY")}/${this.state.meal}/${this.state.zone}/delete`)
   }
 
   onHawkerSelect = (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps) => {
@@ -205,7 +212,7 @@ class StoreList extends React.Component<Props, State> {
             <Route exact path={`${this.props.pathName}`}>
               {this.renderListing(listing, date, update)}
             </Route>
-            <Route path={`${this.props.pathName}/stall/:stallId`} render={(props) => <FoodList meal={this.state.meal} date={date} listing={listing!} {...props} />} />
+            <Route path={`${this.props.pathName}/stall/:stallId`} render={(props) => <FoodList zone={this.state.zone} meal={this.state.meal} date={date} listing={listing!} {...props} />} />
 
           </React.Fragment>
         )}

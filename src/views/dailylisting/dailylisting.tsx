@@ -27,6 +27,7 @@ type Props = RouteComponentProps & {
     params: {
       date: string
       meal: string
+      zone: string
     }
   }
 }
@@ -36,12 +37,13 @@ class DailyListing extends React.Component<Props, State> {
     focused: false,
     date: moment(this.props.match.params.date, "DDMMYYYY"),
     meal: this.props.match.params.meal,
+    zone: this.props.match.params.zone,
     listing: null,
     visible: false,
     update: () => {
-      this.props.history.push(`/dashboard/dailylisting/${this.state.date.format("DDMMYYYY")}`)
+      this.props.history.push(`/dashboard/dailylisting/${this.state.date.format("DDMMYYYY")}/${this.state.meal}/${this.state.zone}`)
       this.setState({ visible: false })
-      this.fetchListing(this.state.date, this.state.meal).then((res: any) => {
+      this.fetchListing(this.state.date, this.state.meal, this.state.zone).then((res: any) => {
         if (res['data'] == null) { 
           this.setState({ listing: null })
         } else {
@@ -54,7 +56,7 @@ class DailyListing extends React.Component<Props, State> {
 
   componentDidMount() {
     this.setState({ date: moment(this.props.match.params.date, "DDMMYYYY") })
-    this.fetchListing(this.state.date, this.state.meal).then((res: any) => {
+    this.fetchListing(this.state.date, this.state.meal, this.state.zone).then((res: any) => {
       if (res['data'] == null) { 
         this.setState({ listing: null })
       } else {
@@ -67,10 +69,10 @@ class DailyListing extends React.Component<Props, State> {
 
   dateChange = (date: Moment) => {
     if (this.state.date.format("DDMMYYYY") !== date.format("DDMMYYYY")) {
-      this.props.history.push(`/dashboard/dailylisting/${date.format("DDMMYYYY")}/${this.state.meal}`)
+      this.props.history.push(`/dashboard/dailylisting/${date.format("DDMMYYYY")}/${this.state.meal}/${this.state.zone}`)
       this.setState({ date })
       this.setState({ visible: false })
-      this.fetchListing(date, this.state.meal).then((res: any) => {
+      this.fetchListing(date, this.state.meal, this.state.zone).then((res: any) => {
         if (res['data'] == null) { 
           this.setState({ listing: null })
         } else {
@@ -83,10 +85,10 @@ class DailyListing extends React.Component<Props, State> {
 
   onMealSelect = (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps) => {
     let mealString: any = data.value
-    this.props.history.push(`/dashboard/dailylisting/${this.state.date.format("DDMMYYYY")}/${data.value}`)
+    this.props.history.push(`/dashboard/dailylisting/${this.state.date.format("DDMMYYYY")}/${mealString}/${this.state.zone}`)
     this.setState({ meal: data.value })
     this.setState({ visible: false })
-    this.fetchListing(this.state.date, mealString).then((res: any) => {
+    this.fetchListing(this.state.date, mealString, this.state.zone).then((res: any) => {
       if (res['data'] == null) { 
         this.setState({ listing: null })
       } else {
@@ -96,8 +98,23 @@ class DailyListing extends React.Component<Props, State> {
     })
   }
 
-  fetchListing = (date: Moment, meal: string) => {
-    let promise: Promise<Listing> = API.get('/listings/' + date.format("DDMMYYYY") + "/" + meal);
+  onZoneSelect = (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps) => {
+    let zoneString: any = data.value
+    this.props.history.push(`/dashboard/dailylisting/${this.state.date.format("DDMMYYYY")}/${this.state.meal}/${zoneString}`)
+    this.setState({ zone: data.value })
+    this.setState({ visible: false })
+    this.fetchListing(this.state.date, this.state.meal, zoneString).then((res: any) => {
+      if (res['data'] == null) { 
+        this.setState({ listing: null })
+      } else {
+        this.setState({ listing: res['data'] })
+      }
+      this.setState({ visible: true })
+    })
+  }
+
+  fetchListing = (date: Moment, meal: string, zone: string) => {
+    let promise: Promise<Listing> = API.get('/listings/get/' + date.format("DDMMYYYY") + "/" + meal + "/" + zone);
     return promise;
   }
 
@@ -114,10 +131,42 @@ class DailyListing extends React.Component<Props, State> {
         value: 'dinner'
       }
     ]
+
+    let zoneOptions = [
+      {
+        key: 'Tembusu',
+        text: 'Tembusu',
+        value: 'Tembusu'
+      },
+      {
+        key: 'Cinammon',
+        text: 'Cinammon',
+        value: 'Cinammon'
+      }
+    ]
+
     return (
       <div>
           <p className="lead">
-            Select Date to edit:
+            Select stall for
+            <Dropdown
+            style={{"marginLeft": "5px"}}
+            placeholder='Select Meals'
+            compact
+            selection
+            defaultValue={this.state.meal}
+            options={mealOptions}
+            onChange={this.onMealSelect}
+          /> at
+          <Dropdown
+            style={{"marginLeft": "5px"}}
+            compact
+            placeholder='Select Zone'
+            selection
+            defaultValue={this.state.zone}
+            options={zoneOptions}
+            onChange={this.onZoneSelect}
+          /> on&nbsp;
           <SingleDatePicker
               id="1"
               orientation="horizontal"
@@ -130,20 +179,12 @@ class DailyListing extends React.Component<Props, State> {
               displayFormat="DD/MM/YYYY"
               small={true}>
             </SingleDatePicker>
-            and meal:
-            <Dropdown
-            placeholder='Select Meals'
-            compact
-            selection
-            defaultValue={this.state.meal}
-            options={mealOptions}
-            onChange={this.onMealSelect}
-          />
+          
           </p>
           <Transition visible={this.state.visible} animation='scale' duration={500}>
           <div>
           <ListingContext.Provider value={this.state}>
-           <StoreList pathName={this.props.match.url} meal={this.state.meal}/>
+           <StoreList pathName={this.props.match.url} meal={this.state.meal} zone={this.state.zone}/>
           </ListingContext.Provider>
           </div>
           </Transition>

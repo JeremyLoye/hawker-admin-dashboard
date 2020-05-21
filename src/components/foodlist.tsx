@@ -10,6 +10,7 @@ type Props = {
   listing: Listing;
   date: Moment;
   meal: string;
+  zone: string;
   match: {
     params: {
       stallId: string;
@@ -67,7 +68,8 @@ class FoodList extends React.Component<Props> {
                                 "stallId": stall.stallId,
                                 "foodId": el.id,
                                 "quantity": el.quantity,
-                                "meal": this.props.meal
+                                "meal": this.props.meal,
+                                "zone": this.props.zone
                               }
                               API.post(`listings/${this.props.date.format("DDMMYYYY")}/quantity`, body)
                               this.forceUpdate()

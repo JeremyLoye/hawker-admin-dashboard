@@ -38,11 +38,12 @@ class Transactions extends React.Component<Props, State> {
     visible: false,
     filter: 'all',
     mealType: 'lunch',
+    zone: 'Tembusu',
     userData: userData
   }
 
   componentDidMount() {
-    this.fetchTransactions(this.state.date, this.state.mealType)
+    this.fetchTransactions(this.state.date, this.state.mealType, this.state.zone)
   }
 
   marginTotal = (cart: CartItem[]) => {
@@ -60,7 +61,7 @@ class Transactions extends React.Component<Props, State> {
       this.props.history.push(`/dashboard/transactions/${date.format("DDMMYYYY")}`)
       this.setState({ date })
       this.setState({ visible: false })
-      this.fetchTransactions(date, this.state.mealType)
+      this.fetchTransactions(date, this.state.mealType, this.state.zone)
     }
   }
 
@@ -69,7 +70,7 @@ class Transactions extends React.Component<Props, State> {
     if (mealString !== this.state.mealType) {
       this.setState({ visible: false })
       this.setState({ mealType: mealString })
-      this.fetchTransactions(this.state.date, mealString)
+      this.fetchTransactions(this.state.date, mealString, this.state.zone)
     }
   }
 
@@ -80,8 +81,18 @@ class Transactions extends React.Component<Props, State> {
     }
   }
 
-  fetchTransactions = (date: Moment, mealType: string) => {
-    API.post('/transactions/datemeal/' + date.format("DDMMYYYY") + `/${mealType}`).then((res: any) => {
+  selectZone = (event: React.SyntheticEvent<HTMLElement>, data: DropdownProps) => {
+    let zoneString: any = data.value
+    if (zoneString !== this.state.zone) {
+      this.setState({ visible: false })
+      this.setState({ zone: zoneString })
+      this.fetchTransactions(this.state.date, this.state.mealType, zoneString)
+    }
+  }
+  
+
+  fetchTransactions = (date: Moment, mealType: string, zone: string) => {
+    API.post('/transactions/get/' + date.format("DDMMYYYY") + `/${mealType}`+ `/${zone}`).then((res: any) => {
       let transactions: Transaction[] = res['data']['transactions']
       this.setState({ transactions: transactions })
       this.setState({ visible: true })
@@ -229,8 +240,6 @@ class Transactions extends React.Component<Props, State> {
   render() {
     return (
       <div>
-        <Grid columns='two' fluid>
-          <Grid.Column width={8}>
             <p className="lead">
               View transactions on:
           <SingleDatePicker
@@ -247,8 +256,9 @@ class Transactions extends React.Component<Props, State> {
                 small={true}>
               </SingleDatePicker>
             </p>
-          </Grid.Column>
-          <Grid.Column width={4}>
+          
+        <Grid columns='three' fluid>
+          <Grid.Column>
             <Dropdown
               key={1}
               placeholder='Meal Type'
@@ -271,7 +281,30 @@ class Transactions extends React.Component<Props, State> {
               onChange={this.selectMealType}
             />
           </Grid.Column>
-          <Grid.Column width={4}>
+          <Grid.Column>
+            <Dropdown
+              key={2}
+              placeholder='Zone'
+              fluid
+              defaultValue='Tembusu'
+              className="huge"
+              selection
+              options={[
+                {
+                  key: 'Cinammon',
+                  text: 'Cinammon',
+                  value: 'Cinammon'
+                },
+                {
+                  key: 'Tembusu',
+                  text: 'Tembusu',
+                  value: 'Tembusu'
+                }
+              ]}
+              onChange={this.selectZone}
+            />
+          </Grid.Column>
+          <Grid.Column>
             <Dropdown
               key={2}
               placeholder='Filter'

@@ -42,7 +42,7 @@ class SideMenu extends Component<Props, State> {
           <Menu borderless fluid inverted size="huge">
             <Container>
 
-              <Link to={`${this.props.pathName}/dailylisting/${this.getCurrentDate()}/lunch`}>
+              <Link to={`${this.props.pathName}/dailylisting/${this.getCurrentDate()}/lunch/Tembusu`}>
                 <Menu.Item as='a' active={this.state.activeItem === 'dailylisting'}
                   onClick={() => this.setState({ activeItem: 'dailylisting' })}>
                   Daily Listing
