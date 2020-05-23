@@ -136,7 +136,7 @@ class Transactions extends React.Component<Props, State> {
     hours = hours ? hours : 12; // the hour '0' should be '12'
     let minuteString = minutes < 10 ? '0' + minutes : minutes;
     let strTime = hours + ':' + minuteString + ' ' + ampm;
-    return datetime.getDate() + "/" + datetime.getMonth() + "/" + datetime.getFullYear() + " " + strTime
+    return datetime.getDate() + "/" + (datetime.getMonth() + 1) + "/" + datetime.getFullYear() + " " + strTime
   }
 
   postToggledTransaction = (id: string, isPaid: boolean) => {

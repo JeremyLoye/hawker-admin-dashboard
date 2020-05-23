@@ -20,13 +20,14 @@ type Props = {
 
 type State = {}
 
+let defaultQuantity: { [key: string]: string } = {}
+
 class FoodList extends React.Component<Props, State> {
   state = {
-    minQuantity: 0,
-    minAmount: 0,
     currentMinAmount: -1,
     currentMinQuantity: -1,
-    stall: this.props.listing.stalls[0] // Dummy value
+    stall: this.props.listing.stalls[0], // Dummy value
+    foodQuantity: defaultQuantity
   }
 
   componentDidMount() {
@@ -37,15 +38,20 @@ class FoodList extends React.Component<Props, State> {
         break;
       }
     }
-    this.setState({ 
+    let quantities = this.state.foodQuantity
+    for (let el of stall.food) {
+      quantities[el.id] = el.quantity.toString()
+    }
+
+    this.setState({
       stall: stall,
-      minQuantity: stall.minQty,
-      minAmount: stall.minPrice
-     })
+      currentMinQuantity: stall.minQty,
+      currentMinAmount: stall.minPrice,
+      foodQuantity: quantities
+    })
   }
 
   displayListPosts = () => {
-    
     return (
       this.state.stall.food.map((el: Food) => (
         <Card
@@ -63,15 +69,25 @@ class FoodList extends React.Component<Props, State> {
                   <Input
                     style={{ height: '2em', width: '5em' }}
                     type='text'
-                    defaultValue={`${el.quantity}`}
+                    value={this.state.foodQuantity[el.id]}
                     onChange={
                       (event: React.FormEvent<HTMLInputElement>, data: InputOnChangeData) => {
-                        let quantity = Number(data.value)
-                        el.quantity = quantity
+                        if (data.value !== "-") {
+                          let quantity = Number(data.value)
+                          if (!Number.isNaN(quantity) && quantity >= -1) {
+                            let updatedQuantities = this.state.foodQuantity
+                            updatedQuantities[el.id] = quantity.toString()
+                            this.setState({ foodQuantity: updatedQuantities })
+                          }
+                        } else {
+                          let updatedQuantities = this.state.foodQuantity
+                          updatedQuantities[el.id] = "-"
+                          this.setState({ foodQuantity: updatedQuantities })
+                        }
                       }
                     }
                   >
-                    <input type='number' min={-1} max={999} />
+                    <input type='text' />
                     <Popup
                       content={"The quantity has been successfully changed."}
                       inverted
@@ -82,17 +98,14 @@ class FoodList extends React.Component<Props, State> {
                           icon='right arrow'
                           onClick={
                             (event: React.FormEvent<HTMLButtonElement>, data: ButtonProps) => {
-                              if (Number.isInteger(el.quantity)) {
-                                const body = {
-                                  "stallId": this.state.stall.stallId,
-                                  "foodId": el.id,
-                                  "quantity": el.quantity,
-                                  "meal": this.props.meal,
-                                  "zone": this.props.zone
-                                }
-                                API.post(`listings/${this.props.date.format("DDMMYYYY")}/quantity`, body)
-                                this.forceUpdate()
+                              const body = {
+                                "stallId": this.state.stall.stallId,
+                                "foodId": el.id,
+                                "quantity": Number(this.state.foodQuantity[el.id]),
+                                "meal": this.props.meal,
+                                "zone": this.props.zone
                               }
+                              API.post(`listings/${this.props.date.format("DDMMYYYY")}/quantity`, body)
                             }
                           }
                         />
@@ -125,7 +138,7 @@ class FoodList extends React.Component<Props, State> {
           <Input
             style={{ height: '2em', width: '5em' }}
             type='text'
-            defaultValue={`${this.state.minAmount}`}
+            value={`${this.state.currentMinAmount}`}
             onChange={
               (event: React.FormEvent<HTMLInputElement>, data: InputOnChangeData) => {
                 let amount = Number(data.value)
@@ -152,9 +165,7 @@ class FoodList extends React.Component<Props, State> {
                         "meal": this.props.meal,
                         "zone": this.props.zone
                       }
-                      console.log(body)
-                      API.post(`listings/minprice`, body).then(res => console.log(res))
-                      this.setState({ minAmount: this.state.currentMinAmount })
+                      API.post(`listings/minprice`, body)
                     }
                   }
                 />
@@ -168,7 +179,7 @@ class FoodList extends React.Component<Props, State> {
           <Input
             style={{ height: '2em', width: '5em' }}
             type='text'
-            defaultValue={`${this.state.minQuantity}`}
+            value={`${this.state.currentMinQuantity}`}
             onChange={
               (event: React.FormEvent<HTMLInputElement>, data: InputOnChangeData) => {
                 let quantity = Number(data.value)
@@ -188,7 +199,7 @@ class FoodList extends React.Component<Props, State> {
                   icon='right arrow'
                   onClick={
                     (event: React.FormEvent<HTMLButtonElement>, data: ButtonProps) => {
-                      
+
                       if (Number.isInteger(this.state.currentMinQuantity)) {
                         const body = {
                           "date": this.props.date.format("DDMMYYYY"),
@@ -197,8 +208,7 @@ class FoodList extends React.Component<Props, State> {
                           "meal": this.props.meal,
                           "zone": this.props.zone
                         }
-                        API.post(`listings/minqty`, body).then(res => console.log(res))
-                        this.setState({ minQuantity: this.state.currentMinQuantity })
+                        API.post(`listings/minqty`, body)
                       }
                     }
                   }

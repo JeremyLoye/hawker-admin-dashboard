@@ -105,7 +105,6 @@ class StoreList extends React.Component<Props, State> {
   }
 
   componentDidMount() {
-  console.log("Post hawker code")
   API.get('/hawkercodes').then((res: any) => {
       const codes: HawkerCode[] = res['data'];
       this.setState({ hawkerCodes: codes })
@@ -209,7 +208,7 @@ class StoreList extends React.Component<Props, State> {
               {this.renderListing(listing, date, update, meal, zone)}
             </Route>
             <Route path={`${this.props.pathName}/stall/:stallId`} render={(props) => 
-            <FoodList zone={this.state.zone} meal={this.state.meal} date={date} listing={listing!} {...props} />} />
+            <FoodList zone={zone} meal={meal} date={date} listing={listing!} {...props} />} />
 
           </React.Fragment>
         )}
