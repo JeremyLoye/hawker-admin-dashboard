@@ -208,7 +208,8 @@ class StoreList extends React.Component<Props, State> {
             <Route exact path={`${this.props.pathName}`}>
               {this.renderListing(listing, date, update, meal, zone)}
             </Route>
-            <Route path={`${this.props.pathName}/stall/:stallId`} render={(props) => <FoodList zone={this.state.zone} meal={this.state.meal} date={date} listing={listing!} {...props} />} />
+            <Route path={`${this.props.pathName}/stall/:stallId`} render={(props) => 
+            <FoodList zone={this.state.zone} meal={this.state.meal} date={date} listing={listing!} {...props} />} />
 
           </React.Fragment>
         )}

@@ -18,6 +18,8 @@ export interface Stall {
   image: string;
   name: string;
   stallId: string;
+  minQty: number;
+  minPrice: number;
 }
 
 export interface Food {
