@@ -11,6 +11,8 @@ export const ListingContext = React.createContext({
   date: moment(),
   listing: listing,
   visible: false,
+  meal: '',
+  zone: '',
   update: () => {}
 })
 
