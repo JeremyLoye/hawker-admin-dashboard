@@ -104,10 +104,12 @@ class StoreList extends React.Component<Props, State> {
     ))
   }
 
-  fetchHawkerCodes = () => {
-    const promise: Promise<HawkerCode[]> = API.get('/hawkercodes');
-
-    return promise;
+  componentDidMount() {
+  console.log("Post hawker code")
+  API.get('/hawkercodes').then((res: any) => {
+      const codes: HawkerCode[] = res['data'];
+      this.setState({ hawkerCodes: codes })
+    })
   }
 
   postHawkerChoice = async (date: Moment, meal: string, zone: string) => {
@@ -134,10 +136,6 @@ class StoreList extends React.Component<Props, State> {
   }
 
   renderDropDownSelection = () => {
-    this.fetchHawkerCodes().then((res: any) => {
-      const codes: HawkerCode[] = res['data'];
-      this.setState({ hawkerCodes: codes })
-    })
     let options: Options[] = [];
     this.state.hawkerCodes.map((hawkerCode: HawkerCode) => {
       options.push({
@@ -178,7 +176,7 @@ class StoreList extends React.Component<Props, State> {
     } else {
       return (
         <React.Fragment>
-          <Grid columns='two' fluid>
+          <Grid columns='two' fluid='true'>
             <Grid.Column width={11}>
               <Header floated='left'>{listing.name}</Header>
 
