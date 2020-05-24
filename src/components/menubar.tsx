@@ -66,7 +66,13 @@ class SideMenu extends Component<Props, State> {
                   onClick={() => this.setState({ activeItem: 'transactions' })}>
                   Transactions
                 </Menu.Item>
-                </Link>
+              </Link>
+              <Link to={'/dashboard/summary'}>
+                <Menu.Item as='a' active={this.state.activeItem === 'summary'}
+                  onClick={() => this.setState({ activeItem: 'summary' })}>
+                  Order Summaries
+                </Menu.Item>
+              </Link>
             </Container>
           </Menu>
         </Grid>

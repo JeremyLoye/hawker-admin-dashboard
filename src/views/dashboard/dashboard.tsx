@@ -18,6 +18,7 @@ import Hawker from "../hawker/hawker";
 
 import Store from "../store/store";
 import Transactions from "../transactions/transactions";
+import SummaryPage from "../summary/summary";
 
 type State = {};
 
@@ -48,6 +49,7 @@ class Dashboard extends Component<Props, State> {
           </Route>
           <Route path={`${this.props.match.path}/stall`} render={(props) => <Store {...props}/>}/>
           <Route path={`${this.props.match.url}/transactions/:date`} render={(props) => <Transactions {...props}/>}/>
+          <Route path={'/dashboard/summary'} component={SummaryPage}/>
         </Container>
       </div>
     );
