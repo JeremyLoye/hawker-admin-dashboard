@@ -10,6 +10,7 @@ export interface Listing {
   name: string;
   orderAvailable: boolean;
   stalls: Stall[];
+  message: string;
 }
 
 export interface Stall {

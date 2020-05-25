@@ -1,9 +1,10 @@
 import 'react-dates/initialize';
 import React from "react";
-import { Card, DropdownProps, Button, Header, Grid, Radio, CheckboxProps, CardProps, Popup } from 'semantic-ui-react'
+import { Card, DropdownProps, Button, Header, Grid, Radio, CheckboxProps, CardProps, Popup, Message, Input, InputOnChangeData } from 'semantic-ui-react'
 import { Dropdown } from "semantic-ui-react";
 import { Link, Route } from 'react-router-dom';
 import moment, { Moment } from 'moment';
+import Parser from 'html-react-parser';
 
 import API from './axiosapi';
 
@@ -35,6 +36,7 @@ type State = {
   meal: string;
   zone: string;
   isAvailable: boolean;
+  message: string;
 }
 
 class StoreList extends React.Component<Props, State> {
@@ -43,7 +45,8 @@ class StoreList extends React.Component<Props, State> {
     hawker: '',
     meal: this.props.meal,
     zone: this.props.zone,
-    isAvailable: true
+    isAvailable: true,
+    message: ''
   }
 
   changeChecked = (isAvail: boolean) => {
@@ -118,6 +121,17 @@ class StoreList extends React.Component<Props, State> {
       "zone": zone
     }
     await API.post(`/listings/${date.format("DDMMYYYY")}/add`, body)
+  }
+
+  postMessageEdit = async (date: Moment, meal: string, zone: string) => {
+    const body = {
+      "date": date.format("DDMMYYYY"),
+      "meal": meal,
+      "zone": zone,
+      "message": this.state.message
+    }
+
+    await API.post('/listings/message', body)
   }
 
   deleteHawkerChoice = async (date: Moment, meal: string, zone: string) => {
@@ -202,6 +216,25 @@ class StoreList extends React.Component<Props, State> {
               </Button>
             </Grid.Column>
           </Grid>
+          <Message warning fluid>
+            <Input
+              style={{ width: '100%' }}
+              defaultValue={listing.message}
+              onChange={
+                (event: React.FormEvent<HTMLInputElement>, data: InputOnChangeData) => {
+                  let newString: any = data.value
+                  this.setState({ message: newString })
+                }
+              }
+              action={{
+                content: 'Edit',
+                onClick: () => {
+                  this.postMessageEdit(date, meal, zone).then(res => update())
+                }
+              }}
+            >
+            </Input>
+          </Message>
           <Card.Group itemsPerRow="2" stackable style={{ paddingTop: '2em' }}>
             {this.renderCards(listing!, date)}
           </Card.Group>
