@@ -1,5 +1,5 @@
 import React from "react";
-import { Dropdown, DropdownProps, Grid, Button } from "semantic-ui-react";
+import { Dropdown, DropdownProps, Grid, Button, Radio, Label } from "semantic-ui-react";
 import moment from 'moment';
 import { SingleDatePicker } from "react-dates";
 
@@ -9,11 +9,15 @@ class SummaryPage extends React.Component {
         meal: "",
         zone: "",
         date: moment(),
-        focused: false
+        unpaid: true,
+        focused: false,
+        datetime: Math.floor(Date.now() / 1000)
     }
 
-    generateReport = () => {
-        console.log(this.state.meal)
+    handleGenerate = () => {
+        this.setState({
+            datetime: Math.floor(Date.now() / 1000)
+        })
     }
 
     render() {
@@ -25,7 +29,7 @@ class SummaryPage extends React.Component {
                 </p>
                 <i>Note that there will be no responses if there are no transactions for the given settings.</i>
                 <Grid centered>
-                    <Grid.Row columns={3}>
+                    <Grid.Row columns={4}>
                         <Grid.Column>
                             <Dropdown
                                 style={{"marginLeft": "5px"}}
@@ -58,14 +62,23 @@ class SummaryPage extends React.Component {
                                 displayFormat="DD/MM/YYYY"
                                 small={true}/>
                         </Grid.Column>
+                        <Grid.Column>
+                        <Label content={this.state.unpaid?"Include unpaid orders":"Exclude unpaid orders"}/>
+                            <Radio
+                                toggle
+                                checked={this.state.unpaid}
+                                onChange={()=>this.setState({unpaid: !this.state.unpaid})}/>
+                        </Grid.Column>
                     </Grid.Row>
                     <Grid.Row columns={1}>
                         <Grid.Column width={6}>
                             <Button
+                                as='a'
+                                href={`https://ouc6l5ennh.execute-api.ap-southeast-1.amazonaws.com/dev/generate_report?zone=${this.state.zone}&date=${this.state.date.format("DDMMYYYY")}&meal=${this.state.meal}&unpaid=${this.state.unpaid}&datetime=${this.state.datetime}`}
+                                target="_blank"
                                 fluid
                                 disabled={this.state.meal.length===0 || this.state.zone.length===0}
-                                as="a"
-                                href={`https://ouc6l5ennh.execute-api.ap-southeast-1.amazonaws.com/dev/generate_report?zone=${this.state.zone}&date=${this.state.date.format("DDMMYYYY")}&meal=${this.state.meal}&datetime=${Math.floor(Date.now() / 1000)}`}>
+                                onClick={this.handleGenerate}>
                             Generate
                             </Button>
                         </Grid.Column>
