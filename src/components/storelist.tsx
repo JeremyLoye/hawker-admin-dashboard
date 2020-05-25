@@ -105,7 +105,7 @@ class StoreList extends React.Component<Props, State> {
   }
 
   componentDidMount() {
-  API.get('/hawkercodes').then((res: any) => {
+    API.get('/hawkercodes').then((res: any) => {
       const codes: HawkerCode[] = res['data'];
       this.setState({ hawkerCodes: codes })
     })
@@ -175,6 +175,18 @@ class StoreList extends React.Component<Props, State> {
     } else {
       return (
         <React.Fragment>
+          {this.renderDropDownSelection()}
+          <Button
+            size="huge"
+            disabled={
+              this.state.hawker === '' ||
+              this.state.meal === ''
+            }
+            onClick={() => {
+              this.postHawkerChoice(date, meal, zone).then(res => update())
+            }}>
+            Add
+        </Button>
           <Grid columns='two' fluid='true'>
             <Grid.Column width={11}>
               <Header floated='left'>{listing.name}</Header>
@@ -207,8 +219,8 @@ class StoreList extends React.Component<Props, State> {
             <Route exact path={`${this.props.pathName}`}>
               {this.renderListing(listing, date, update, meal, zone)}
             </Route>
-            <Route path={`${this.props.pathName}/stall/:stallId`} render={(props) => 
-            <FoodList zone={zone} meal={meal} date={date} listing={listing!} {...props} />} />
+            <Route path={`${this.props.pathName}/stall/:stallId`} render={(props) =>
+              <FoodList zone={zone} meal={meal} date={date} listing={listing!} {...props} />} />
 
           </React.Fragment>
         )}
