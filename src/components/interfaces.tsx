@@ -21,6 +21,7 @@ export interface Stall {
   stallId: string;
   minQty: number;
   minPrice: number;
+  type: any[]
 }
 
 export interface Food {

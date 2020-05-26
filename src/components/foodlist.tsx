@@ -5,6 +5,7 @@ import { Food, Listing, Stall } from './interfaces';
 
 import API from './axiosapi';
 import { Moment } from 'moment';
+import './storelist.css'
 
 type Props = {
   listing: Listing;
@@ -55,69 +56,71 @@ class FoodList extends React.Component<Props, State> {
     return (
       this.state.stall.food.map((el: Food) => (
         <Card
-          image={el.image}
-          header={el.name}
-          meta={`$${el.price.toFixed(2)}`}
-          description={el.description}
-          extra={
-            <React.Fragment>
-              <p>Quantity: </p>
-              <Popup
-                content={'Key in quantity of food for the day. "-1" indicates no limit.'}
-                key={`${el.id}`}
-                trigger={
-                  <Input
-                    style={{ height: '2em', width: '5em' }}
-                    type='text'
-                    value={this.state.foodQuantity[el.id]}
-                    onChange={
-                      (event: React.FormEvent<HTMLInputElement>, data: InputOnChangeData) => {
-                        if (data.value !== "-") {
-                          let quantity = Number(data.value)
-                          if (!Number.isNaN(quantity) && quantity >= -1) {
-                            let updatedQuantities = this.state.foodQuantity
-                            updatedQuantities[el.id] = quantity.toString()
-                            this.setState({ foodQuantity: updatedQuantities })
-                          }
-                        } else {
+          fluid={true}>
+        <div className="listingImage" style={{"backgroundImage":`url(${el.image})`}}></div>
+        <Card.Content>
+          <Card.Header>{el.name}</Card.Header>
+          <Card.Meta>{`$${el.price.toFixed(2)}`}</Card.Meta>
+          <Card.Description>{el.description}</Card.Description>
+        </Card.Content>
+        <Card.Content extra>
+          <React.Fragment>
+            <p>Quantity: </p>
+            <Popup
+              content={'Key in quantity of food for the day. "-1" indicates no limit.'}
+              key={`${el.id}`}
+              trigger={
+                <Input
+                  style={{ height: '2em', width: '5em' }}
+                  type='text'
+                  value={this.state.foodQuantity[el.id]}
+                  onChange={
+                    (event: React.FormEvent<HTMLInputElement>, data: InputOnChangeData) => {
+                      if (data.value !== "-") {
+                        let quantity = Number(data.value)
+                        if (!Number.isNaN(quantity) && quantity >= -1) {
                           let updatedQuantities = this.state.foodQuantity
-                          updatedQuantities[el.id] = "-"
+                          updatedQuantities[el.id] = quantity.toString()
                           this.setState({ foodQuantity: updatedQuantities })
                         }
+                      } else {
+                        let updatedQuantities = this.state.foodQuantity
+                        updatedQuantities[el.id] = "-"
+                        this.setState({ foodQuantity: updatedQuantities })
                       }
                     }
-                  >
-                    <input type='text' />
-                    <Popup
-                      content={"The quantity has been successfully changed."}
-                      inverted
-                      on='click'
-                      key={`${el.id}`}
-                      trigger={
-                        <Button
-                          icon='right arrow'
-                          onClick={
-                            (event: React.FormEvent<HTMLButtonElement>, data: ButtonProps) => {
-                              const body = {
-                                "stallId": this.state.stall.stallId,
-                                "foodId": el.id,
-                                "quantity": Number(this.state.foodQuantity[el.id]),
-                                "meal": this.props.meal,
-                                "zone": this.props.zone
-                              }
-                              API.post(`listings/${this.props.date.format("DDMMYYYY")}/quantity`, body)
+                  }
+                >
+                  <input type='text' />
+                  <Popup
+                    content={"The quantity has been successfully changed."}
+                    inverted
+                    on='click'
+                    key={`${el.id}`}
+                    trigger={
+                      <Button
+                        icon='right arrow'
+                        onClick={
+                          (event: React.FormEvent<HTMLButtonElement>, data: ButtonProps) => {
+                            const body = {
+                              "stallId": this.state.stall.stallId,
+                              "foodId": el.id,
+                              "quantity": Number(this.state.foodQuantity[el.id]),
+                              "meal": this.props.meal,
+                              "zone": this.props.zone
                             }
+                            API.post(`listings/${this.props.date.format("DDMMYYYY")}/quantity`, body)
                           }
-                        />
-                      }
-                    />
-                  </Input>
-                }
-              />
-            </React.Fragment>
-          }
-          fluid={true}
-        />
+                        }
+                      />
+                    }
+                  />
+                </Input>
+              }
+            />
+          </React.Fragment>
+        </Card.Content>
+        </Card>   
       ))
     )
   }

@@ -1,10 +1,9 @@
 import 'react-dates/initialize';
 import React from "react";
-import { Card, DropdownProps, Button, Header, Grid, Radio, CheckboxProps, CardProps, Popup, Message, Input, InputOnChangeData } from 'semantic-ui-react'
+import { Card, DropdownProps, Button, Header, Grid, Radio, CheckboxProps, CardProps, Popup, Message, Input, InputOnChangeData, Dimmer } from 'semantic-ui-react'
 import { Dropdown } from "semantic-ui-react";
-import { Link, Route } from 'react-router-dom';
+import { Link, Route, RouteComponentProps } from 'react-router-dom';
 import moment, { Moment } from 'moment';
-import Parser from 'html-react-parser';
 
 import API from './axiosapi';
 
@@ -12,6 +11,7 @@ import 'react-dates/lib/css/_datepicker.css';
 import { Listing, Stall } from './interfaces';
 import { ListingContext } from './appcontexts';
 import FoodList from './foodlist';
+import './storelist.css';
 
 interface HawkerCode {
   code: string;
@@ -24,7 +24,7 @@ interface Options {
   value: string;
 }
 
-type Props = {
+type Props = RouteComponentProps & {
   pathName: string;
   meal: string;
   zone: string;
@@ -54,7 +54,13 @@ class StoreList extends React.Component<Props, State> {
   }
 
   renderCards = (listing: Listing, date: Moment) => {
-    return listing.stalls.map((stall: Stall) => (
+    return listing.stalls.map((stall: Stall) => {
+      let type: string = "food"
+      if (stall['type'].length>0) {
+        type = stall['type'][0].toLowerCase()
+      }
+      const imageurl = (stall.image !== "") ? stall.image : `https://hawker-images.s3-ap-southeast-1.amazonaws.com/generic_images/stall_${type}.jpg`
+      return (
       <Popup
         content={"Stall set to not available for this day"}
         disabled={stall.available}
@@ -68,8 +74,6 @@ class StoreList extends React.Component<Props, State> {
             key={stall.stallId + " " + date.format("DDMMYYYY")}
             childKey={stall.stallId + " " + date.format("DDMMYYYY")}
             image={stall.image}
-            header={stall.name}
-            meta={stall.stallId}
             fluid={true}
             onClick={
               (event: React.MouseEvent<HTMLElement>, data: CardProps) => {
@@ -77,8 +81,13 @@ class StoreList extends React.Component<Props, State> {
                   event.preventDefault();
                 }
               }
-            }
-            extra={
+            }>
+            <div className='listingImage' style={stall.available?{"backgroundImage":`url(${imageurl})`}:{"backgroundImage":`url(${imageurl})`, "opacity": 0.1}}></div>
+            <Card.Content>
+              <Card.Header>{stall.name}</Card.Header>
+              <Card.Meta>{stall.stallId}</Card.Meta>
+            </Card.Content>
+            <Card.Content extra>
               <Radio
                 key={stall.stallId + " " + date.format("DDMMYYYY")}
                 label="Availability"
@@ -99,12 +108,18 @@ class StoreList extends React.Component<Props, State> {
                       "zone": this.state.zone
                     }
                     await API.post(`/listings/${date.format("DDMMYYYY")}/availability`, body)
+                      .then(res => {
+                        if ("success" in res.data && isAvailable) {
+                          this.props.history.push(`${this.props.pathName}/stall/${stall.stallId}`)
+                      }})
                   }
                 }
-              />} />
+              />
+            </Card.Content>
+          </Card>
         }
       />
-    ))
+    )})
   }
 
   componentDidMount() {

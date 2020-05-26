@@ -184,7 +184,7 @@ class DailyListing extends React.Component<Props, State> {
           <Transition visible={this.state.visible} animation='scale' duration={500}>
           <div>
           <ListingContext.Provider value={this.state}>
-           <StoreList pathName={this.props.match.url} meal={this.state.meal} zone={this.state.zone}/>
+           <StoreList pathName={this.props.match.url} meal={this.state.meal} zone={this.state.zone} {...this.props}/>
           </ListingContext.Provider>
           </div>
           </Transition>
