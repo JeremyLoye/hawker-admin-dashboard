@@ -6,6 +6,8 @@ import { Link } from "react-router-dom";
 
 import moment, { Moment } from 'moment';
 
+import { Auth } from "aws-amplify";
+
 type State = {};
 
 type Props = {
@@ -33,6 +35,12 @@ class SideMenu extends Component<Props, State> {
 
   getCurrentDate = () => {
     return moment().format("DDMMYYYY");
+  }
+
+  logout = async() => {
+    await Auth.signOut({ global: true}).then(()=>{
+      window.location.reload(false);
+    })
   }
 
   render() {
@@ -73,6 +81,10 @@ class SideMenu extends Component<Props, State> {
                   Order Summaries
                 </Menu.Item>
               </Link>
+              <Menu.Item position='right' as='a'
+                onClick={this.logout}>
+                Logout
+              </Menu.Item>
             </Container>
           </Menu>
         </Grid>
