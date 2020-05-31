@@ -38,7 +38,7 @@ class Transactions extends React.Component<Props, State> {
     visible: false,
     filter: 'all',
     mealType: 'lunch',
-    zone: 'Tembusu',
+    zone: 'Cinnamon',
     userData: userData
   }
 
@@ -119,6 +119,14 @@ class Transactions extends React.Component<Props, State> {
     return filteredTransactions
   }
 
+  getName = (id:string) => {
+    if (id in this.state.userData) {
+      return this.state.userData[id].name
+    } else {
+      return ""
+    }
+  }
+
   getPhoneNumber = (id: string) => {
     if (id in this.state.userData) {
       return this.state.userData[id].phone
@@ -168,7 +176,8 @@ class Transactions extends React.Component<Props, State> {
           </List.Content>
           <List.Header>
             {transaction.paymentUsername} ({transaction.paymentMethod})
-        </List.Header>
+          </List.Header>
+          {this.getName(transaction.awsId)}
           <List.Content floated="right">
             <Button
               toggle
@@ -285,7 +294,7 @@ class Transactions extends React.Component<Props, State> {
               key={2}
               placeholder='Zone'
               fluid
-              defaultValue='Tembusu'
+              defaultValue='Cinnamon'
               className="huge"
               selection
               options={[
