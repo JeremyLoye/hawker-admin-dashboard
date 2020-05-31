@@ -81,6 +81,12 @@ class SideMenu extends Component<Props, State> {
                   Order Summaries
                 </Menu.Item>
               </Link>
+              <Link to='/dashboard/newusers'>
+              <Menu.Item as='a' active={this.state.activeItem === 'newuser'}
+                  onClick={() => this.setState({activeItem: "newuser"})}>
+                  New Users
+                </Menu.Item>
+              </Link>
               <Menu.Item position='right' as='a'
                 onClick={this.logout}>
                 Logout
@@ -124,10 +130,33 @@ class SideMenu extends Component<Props, State> {
               </Menu.Item>
               </Link>
               <Link to={`${this.props.pathName}/stall`}>
-                <Menu.Item as="a">
-                  Stores
-              </Menu.Item>
+                <Menu.Item as='a' active={this.state.activeItem === 'store'}
+                  onClick={() => this.setState({ activeItem: 'store' })}>
+                  Stalls
+                </Menu.Item>
               </Link>
+              <Link to={`${this.props.pathName}/transactions/${this.getCurrentDate()}`}>
+                <Menu.Item as='a' active={this.state.activeItem === 'transactions'}
+                  onClick={() => this.setState({ activeItem: 'transactions' })}>
+                  Transactions
+                </Menu.Item>
+              </Link>
+              <Link to={'/dashboard/summary'}>
+                <Menu.Item as='a' active={this.state.activeItem === 'summary'}
+                  onClick={() => this.setState({ activeItem: 'summary' })}>
+                  Order Summaries
+                </Menu.Item>
+              </Link>
+              <Link to='/dashboard/newusers'>
+              <Menu.Item as='a' active={this.state.activeItem === 'newuser'}
+                  onClick={() => this.setState({activeItem: "newuser"})}>
+                  New Users
+                </Menu.Item>
+              </Link>
+              <Menu.Item position='right' as='a'
+                onClick={this.logout}>
+                Logout
+              </Menu.Item>
             </Menu>
           </Menu>
         </Grid>

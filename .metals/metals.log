@@ -1,3 +1,6 @@
 2020.05.24 21:32:58 INFO  started: Metals version 0.9.0 in workspace 'C:\NUS\Hawker\hawker-deliveries-admin-dashboard'
 2020.05.24 21:32:59 INFO  time: initialize in 1.34s
 2020.05.24 21:33:01 WARN  no build tool detected in workspace 'C:\NUS\Hawker\hawker-deliveries-admin-dashboard'. The most common cause for this problem is that the editor was opened in the wrong working directory, for example if you use sbt then the workspace directory should contain build.sbt. 
+2020.05.31 22:20:14 INFO  started: Metals version 0.9.0 in workspace 'C:\NUS\Hawker\hawker-deliveries-admin-dashboard'
+2020.05.31 22:20:15 INFO  time: initialize in 1.64s
+2020.05.31 22:20:21 WARN  no build tool detected in workspace 'C:\NUS\Hawker\hawker-deliveries-admin-dashboard'. The most common cause for this problem is that the editor was opened in the wrong working directory, for example if you use sbt then the workspace directory should contain build.sbt. 

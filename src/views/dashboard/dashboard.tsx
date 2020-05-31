@@ -19,6 +19,7 @@ import Hawker from "../hawker/hawker";
 import Store from "../store/store";
 import Transactions from "../transactions/transactions";
 import SummaryPage from "../summary/summary";
+import NewUsersPage from "../newusers/newusers";
 
 type State = {};
 
@@ -36,7 +37,7 @@ class Dashboard extends Component<Props, State> {
     return (
       <div className="App">
         <Menubar pathName={this.props.match.url}></Menubar>
-        <Container  text textAlign="center">
+        <Container text textAlign="center">
           <Route exact path={`${this.props.match.url}`}>
             <Header size="huge">Welcome to Admin Dashboard!</Header>
             <p className="lead">
@@ -50,6 +51,7 @@ class Dashboard extends Component<Props, State> {
           <Route path={`${this.props.match.path}/stall`} render={(props) => <Store {...props}/>}/>
           <Route path={`${this.props.match.url}/transactions/:date`} render={(props) => <Transactions {...props}/>}/>
           <Route path={'/dashboard/summary'} component={SummaryPage}/>
+          <Route path='/dashboard/newusers' component={NewUsersPage}/>
         </Container>
       </div>
     );
